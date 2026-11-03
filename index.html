@@ -1,0 +1,1560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>AuraWardrobe - AI Personal Stylist & Digital Closet</title>
+  <!-- Standalone Mobile App (PWA) Meta Tags for iOS & Android -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="AuraWardrobe">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#754D3B">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23754D3B'/%3E%3Ctext x='50' y='65' font-family='serif' font-size='50' font-weight='bold' fill='white' text-anchor='middle'%3EA%3C/text%3E%3C/svg%3E">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#FAF7F5',
+              100: '#F5EFEA',
+              200: '#EBDCD3',
+              300: '#DCC3B3',
+              400: '#C7A28C',
+              500: '#B08269',
+              600: '#94664F',
+              700: '#754D3B',
+              800: '#5A3A2C',
+              900: '#3D261C',
+            },
+            champagne: '#EED9C4',
+            sage: '#A3B18A',
+            terracotta: '#D97757',
+            emeraldDeep: '#1B4931',
+            plumDeep: '#4A1D36',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            serif: ['Playfair Display', 'Georgia', 'serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    /* Mobile-first polish & smooth scrolling */
+    html { -webkit-tap-highlight-color: transparent; scroll-behavior: smooth; }
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: #FAF7F5; }
+    ::-webkit-scrollbar-thumb { background: #DCC3B3; border-radius: 9999px; }
+    .badge-glow { box-shadow: 0 0 12px rgba(176, 130, 105, 0.25); }
+    .glass-card { background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(10px); }
+  </style>
+</head>
+<body class="bg-[#FAF7F5] text-stone-800 font-sans antialiased min-h-screen flex flex-col pb-20 sm:pb-8">
+
+  <!-- ======================================================== -->
+  <!-- TOP NAVIGATION HEADER                                   -->
+  <!-- ======================================================== -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-stone-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+      <div class="flex items-center justify-between h-16">
+        <!-- Logo & Profile Pill -->
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-brand-800 via-brand-600 to-amber-200 flex items-center justify-center text-white shadow-sm font-serif font-bold text-xl">
+            A
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-serif font-bold text-lg sm:text-xl tracking-tight text-stone-900">AuraWardrobe</span>
+              <span class="hidden sm:inline-block text-[11px] font-semibold px-2 py-0.5 rounded-full bg-brand-100 text-brand-800 border border-brand-200">Mobile Edition</span>
+            </div>
+            <p id="header-profile-subtitle" class="text-[11px] text-stone-500 font-medium">Warm Wheatish • Pear Frame • 28 Items</p>
+          </div>
+        </div>
+
+        <!-- Quick Action Buttons -->
+        <div class="flex items-center gap-2">
+          <button onclick="openProfileModal()" class="px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg text-xs font-semibold bg-stone-100 hover:bg-stone-200 text-stone-700 transition-colors flex items-center gap-1.5">
+            <svg class="w-4 h-4 text-brand-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+            <span class="hidden sm:inline">My Profile</span>
+          </button>
+          <button onclick="openAddItemModal()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-brand-700 hover:bg-brand-800 text-white shadow-sm transition-colors flex items-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            <span>Add Item</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Desktop / Tablet Navigation Bar -->
+      <nav class="hidden md:flex items-center gap-1 overflow-x-auto py-2 border-t border-stone-100 text-xs font-medium text-stone-600">
+        <button onclick="switchTab('today')" id="dtab-today" class="dtab-btn px-3 py-1.5 rounded-lg bg-brand-700 text-white">☀️ Today's Outfit</button>
+        <button onclick="switchTab('closet')" id="dtab-closet" class="dtab-btn px-3 py-1.5 rounded-lg hover:bg-stone-100">👗 Digital Closet</button>
+        <button onclick="switchTab('flattery')" id="dtab-flattery" class="dtab-btn px-3 py-1.5 rounded-lg hover:bg-stone-100">⚖️ Flattery Verdicts</button>
+        <button onclick="switchTab('outfits')" id="dtab-outfits" class="dtab-btn px-3 py-1.5 rounded-lg hover:bg-stone-100">✨ Head-to-Toe Looks</button>
+        <button onclick="switchTab('mixer')" id="dtab-mixer" class="dtab-btn px-3 py-1.5 rounded-lg hover:bg-stone-100">🪞 Closet Mixer</button>
+        <button onclick="switchTab('events')" id="dtab-events" class="dtab-btn px-3 py-1.5 rounded-lg hover:bg-stone-100">🎉 Event Stylist</button>
+        <button onclick="switchTab('travel')" id="dtab-travel" class="dtab-btn px-3 py-1.5 rounded-lg hover:bg-stone-100">🧳 Travel Capsule</button>
+        <button onclick="switchTab('insights')" id="dtab-insights" class="dtab-btn px-3 py-1.5 rounded-lg hover:bg-stone-100">📊 Insights & Shopping</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ======================================================== -->
+  <!-- MAIN APP CONTAINER                                       -->
+  <!-- ======================================================== -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-6">
+
+    <!-- ======================================================== -->
+    <!-- TAB 1: TODAY'S MORNING GENERATOR                         -->
+    <!-- ======================================================== -->
+    <div id="tab-today" class="tab-view space-y-6">
+
+      <!-- Standalone App Quick Install Banner -->
+      <div id="install-app-banner" class="bg-gradient-to-r from-brand-800 to-stone-900 rounded-2xl p-4 text-white shadow-md flex items-center justify-between gap-3 border border-brand-700">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-xl flex-shrink-0">
+            📱
+          </div>
+          <div>
+            <h4 class="font-bold text-xs sm:text-sm">Use as Standalone Mobile App</h4>
+            <p class="text-[11px] text-stone-300">Run full-screen on iPhone & Android without browser bars.</p>
+          </div>
+        </div>
+        <button onclick="showInstallInstructions()" class="px-3.5 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-stone-950 font-bold text-xs shadow transition-all whitespace-nowrap">
+          Install App
+        </button>
+      </div>
+
+      <!-- Weather & Climate Card -->
+      <div class="bg-gradient-to-r from-stone-900 via-brand-900 to-stone-900 rounded-2xl p-5 sm:p-6 text-white shadow-md border border-stone-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="space-y-1">
+          <div class="flex items-center gap-2">
+            <span class="text-xs px-2.5 py-0.5 rounded-full bg-white/10 text-amber-200 font-semibold tracking-wide uppercase">Doddathoguru / Bengaluru Local Weather</span>
+            <span class="text-xs text-stone-400">☀️ 26°C • Pleasant / Breezy</span>
+          </div>
+          <h2 class="font-serif text-2xl sm:text-3xl font-bold tracking-tight">What to Wear Today</h2>
+          <p class="text-stone-300 text-xs sm:text-sm">Personalized from your uploaded closet with climate & fabric breathability calibration.</p>
+        </div>
+        <div class="flex items-center gap-2 flex-wrap">
+          <div class="bg-white/10 p-1 rounded-xl flex items-center text-xs">
+            <button onclick="setClimateMode('ac')" id="climate-ac" class="px-2.5 py-1 rounded-lg bg-white/20 text-white font-medium">🏢 AC Office</button>
+            <button onclick="setClimateMode('outdoor')" id="climate-outdoor" class="px-2.5 py-1 rounded-lg text-stone-300 hover:text-white font-medium">☀️ Outdoor</button>
+          </div>
+          <button onclick="shuffleTodayOutfit()" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-stone-950 font-semibold text-xs sm:text-sm shadow-sm transition-all flex items-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            <span>Shuffle Look</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Morning Vibe Pills -->
+      <div class="bg-white rounded-xl p-3.5 border border-stone-200 shadow-sm flex items-center gap-2 overflow-x-auto text-xs">
+        <span class="font-bold text-stone-400 uppercase tracking-wider flex-shrink-0 text-[10px]">Morning Vibe:</span>
+        <button onclick="setVibe('office')" id="vibe-office" class="vibe-btn px-3 py-1 rounded-full bg-brand-700 text-white font-semibold whitespace-nowrap">💼 Sharp & Office Ready</button>
+        <button onclick="setVibe('casual')" id="vibe-casual" class="vibe-btn px-3 py-1 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-700 font-medium whitespace-nowrap">☕ Effortless & Casual</button>
+        <button onclick="setVibe('festive')" id="vibe-festive" class="vibe-btn px-3 py-1 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-700 font-medium whitespace-nowrap">🌸 Festive & Graceful</button>
+        <button onclick="setVibe('party')" id="vibe-party" class="vibe-btn px-3 py-1 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-700 font-medium whitespace-nowrap">🥂 Evening Glamour</button>
+      </div>
+
+      <!-- Today's Hero Outfit Card -->
+      <div id="today-outfit-container">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- TAB 2: DIGITAL CLOSET SHELVES                            -->
+    <!-- ======================================================== -->
+    <div id="tab-closet" class="tab-view hidden space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h2 class="font-serif text-2xl font-bold text-stone-900">Your Digital Wardrobe</h2>
+          <p class="text-xs sm:text-sm text-stone-500">All clothes, shoes, accessories, and makeup stored securely in your cloud.</p>
+        </div>
+        <button onclick="openAddItemModal()" class="px-4 py-2 rounded-xl bg-brand-700 hover:bg-brand-800 text-white text-xs sm:text-sm font-semibold shadow-sm flex items-center gap-2 self-start sm:self-auto">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          <span>+ Add New Item to Closet</span>
+        </button>
+      </div>
+
+      <!-- Category Filter Tabs -->
+      <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
+        <button onclick="filterCloset('all')" id="closet-tab-all" class="closet-nav-btn px-3 py-1.5 rounded-lg bg-brand-700 text-white font-semibold whitespace-nowrap">All Items (28)</button>
+        <button onclick="filterCloset('dresses')" id="closet-tab-dresses" class="closet-nav-btn px-3 py-1.5 rounded-lg bg-white border border-stone-200 hover:bg-stone-50 text-stone-700 font-medium whitespace-nowrap">👗 Dresses & Outfits (8)</button>
+        <button onclick="filterCloset('shoes')" id="closet-tab-shoes" class="closet-nav-btn px-3 py-1.5 rounded-lg bg-white border border-stone-200 hover:bg-stone-50 text-stone-700 font-medium whitespace-nowrap">👠 Shoes (4)</button>
+        <button onclick="filterCloset('bags')" id="closet-tab-bags" class="closet-nav-btn px-3 py-1.5 rounded-lg bg-white border border-stone-200 hover:bg-stone-50 text-stone-700 font-medium whitespace-nowrap">👜 Handbags (3)</button>
+        <button onclick="filterCloset('jewelry')" id="closet-tab-jewelry" class="closet-nav-btn px-3 py-1.5 rounded-lg bg-white border border-stone-200 hover:bg-stone-50 text-stone-700 font-medium whitespace-nowrap">💍 Jewelry (4)</button>
+        <button onclick="filterCloset('layers')" id="closet-tab-layers" class="closet-nav-btn px-3 py-1.5 rounded-lg bg-white border border-stone-200 hover:bg-stone-50 text-stone-700 font-medium whitespace-nowrap">🧥 Layers & Outerwear (3)</button>
+        <button onclick="filterCloset('makeup')" id="closet-tab-makeup" class="closet-nav-btn px-3 py-1.5 rounded-lg bg-white border border-stone-200 hover:bg-stone-50 text-stone-700 font-medium whitespace-nowrap">💄 Lipsticks & Liners (6)</button>
+      </div>
+
+      <!-- Closet Grid -->
+      <div id="closet-items-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3.5 sm:gap-4">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- TAB 3: FLATTERY VERDICTS & RESCUE STYLING                -->
+    <!-- ======================================================== -->
+    <div id="tab-flattery" class="tab-view hidden space-y-6">
+      <div class="bg-white rounded-2xl p-5 sm:p-6 border border-stone-200 shadow-sm space-y-2">
+        <span class="text-xs font-bold uppercase tracking-wider text-brand-700">Honest Wardrobe Critique</span>
+        <h2 class="font-serif text-2xl sm:text-3xl font-bold text-stone-900">Does It Flatter My Look?</h2>
+        <p class="text-xs sm:text-sm text-stone-600 leading-relaxed">
+          An honest evaluation of every dress in your closet based on your **Warm Wheatish complexion** and **Pear silhouette**. If a dress doesn't naturally flatter you, it explains the exact reason why and gives a step-by-step **Rescue Formula** using your owned layers, accessories, and makeup to make it a 10/10 look!
+        </p>
+      </div>
+
+      <!-- Dress Flattery Cards -->
+      <div id="flattery-cards-container" class="space-y-4">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- TAB 4: HEAD-TO-TOE OUTFITS                               -->
+    <!-- ======================================================== -->
+    <div id="tab-outfits" class="tab-view hidden space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h2 class="font-serif text-2xl font-bold text-stone-900">Curated Head-to-Toe Outfits</h2>
+          <p class="text-xs sm:text-sm text-stone-500">Engineered strictly from what you already own with simple vs glam beauty toggles.</p>
+        </div>
+        <!-- Simple vs Glam toggle -->
+        <div class="flex items-center gap-2 self-start sm:self-auto bg-white p-1 rounded-xl border border-stone-200 text-xs font-medium">
+          <span class="text-stone-400 pl-2">Makeup Mode:</span>
+          <button onclick="toggleMakeupMode('simple')" id="mmode-simple" class="px-2.5 py-1 rounded-lg bg-stone-100 text-stone-700">🌱 Simple / 5-Min</button>
+          <button onclick="toggleMakeupMode('glam')" id="mmode-glam" class="px-2.5 py-1 rounded-lg bg-brand-700 text-white font-semibold">✨ Full Glam</button>
+        </div>
+      </div>
+
+      <!-- Outfits Grid -->
+      <div id="outfits-cards-grid" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- TAB 5: CLOSET MIXER STUDIO                               -->
+    <!-- ======================================================== -->
+    <div id="tab-mixer" class="tab-view hidden space-y-6">
+      <div class="bg-white rounded-2xl p-5 sm:p-6 border border-stone-200 shadow-sm space-y-6">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-brand-700">Interactive Canvas</span>
+          <h2 class="font-serif text-2xl sm:text-3xl font-bold text-stone-900">Virtual Closet Mixer</h2>
+          <p class="text-xs sm:text-sm text-stone-500 mt-1">Pick any combination from your wardrobe to see your real-time Style Harmony Score and feedback.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Selectors -->
+          <div class="lg:col-span-2 space-y-3.5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <!-- Dress Selector -->
+              <div class="p-3.5 rounded-xl bg-stone-50 border border-stone-200 space-y-1">
+                <label class="text-[11px] font-bold text-stone-700 uppercase tracking-wide block">1. Select Dress / Outfit</label>
+                <select id="mix-dress" onchange="calcMixerScore()" class="w-full text-xs sm:text-sm bg-white border border-stone-300 rounded-lg p-2 focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                  <!-- Injected by JS -->
+                </select>
+              </div>
+
+              <!-- Layering Selector -->
+              <div class="p-3.5 rounded-xl bg-stone-50 border border-stone-200 space-y-1">
+                <label class="text-[11px] font-bold text-stone-700 uppercase tracking-wide block">2. Select Layer / Jacket</label>
+                <select id="mix-layer" onchange="calcMixerScore()" class="w-full text-xs sm:text-sm bg-white border border-stone-300 rounded-lg p-2 focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                  <!-- Injected by JS -->
+                </select>
+              </div>
+
+              <!-- Shoe Selector -->
+              <div class="p-3.5 rounded-xl bg-stone-50 border border-stone-200 space-y-1">
+                <label class="text-[11px] font-bold text-stone-700 uppercase tracking-wide block">3. Select Footwear</label>
+                <select id="mix-shoes" onchange="calcMixerScore()" class="w-full text-xs sm:text-sm bg-white border border-stone-300 rounded-lg p-2 focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                  <!-- Injected by JS -->
+                </select>
+              </div>
+
+              <!-- Jewelry Selector -->
+              <div class="p-3.5 rounded-xl bg-stone-50 border border-stone-200 space-y-1">
+                <label class="text-[11px] font-bold text-stone-700 uppercase tracking-wide block">4. Select Jewelry</label>
+                <select id="mix-jewelry" onchange="calcMixerScore()" class="w-full text-xs sm:text-sm bg-white border border-stone-300 rounded-lg p-2 focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                  <!-- Injected by JS -->
+                </select>
+              </div>
+
+              <!-- Handbag Selector -->
+              <div class="p-3.5 rounded-xl bg-stone-50 border border-stone-200 space-y-1">
+                <label class="text-[11px] font-bold text-stone-700 uppercase tracking-wide block">5. Select Handbag</label>
+                <select id="mix-bag" onchange="calcMixerScore()" class="w-full text-xs sm:text-sm bg-white border border-stone-300 rounded-lg p-2 focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                  <!-- Injected by JS -->
+                </select>
+              </div>
+
+              <!-- Lipstick Selector -->
+              <div class="p-3.5 rounded-xl bg-stone-50 border border-stone-200 space-y-1">
+                <label class="text-[11px] font-bold text-stone-700 uppercase tracking-wide block">6. Select Lipstick</label>
+                <select id="mix-lip" onchange="calcMixerScore()" class="w-full text-xs sm:text-sm bg-white border border-stone-300 rounded-lg p-2 focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                  <!-- Injected by JS -->
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Real-time Scorecard -->
+          <div class="bg-gradient-to-br from-stone-900 via-brand-950 to-stone-900 rounded-2xl p-5 text-white flex flex-col justify-between shadow-md">
+            <div class="space-y-4">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold tracking-wider text-amber-300 uppercase">Live Evaluation</span>
+                <span id="mix-verdict-badge" class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">96% Harmonious</span>
+              </div>
+
+              <div class="text-center py-2">
+                <span id="mix-score-num" class="font-serif text-5xl font-bold tracking-tight text-white">96</span>
+                <span class="text-sm text-stone-400">/100</span>
+                <p id="mix-score-label" class="text-xs text-stone-300 mt-0.5">High Silhouette & Color Synergy</p>
+              </div>
+
+              <!-- Metrics -->
+              <div class="space-y-2 pt-2 border-t border-white/10 text-xs">
+                <div>
+                  <div class="flex justify-between text-[11px] mb-1">
+                    <span class="text-stone-300">Skin Undertone Match</span>
+                    <span id="meter-undertone" class="text-amber-300 font-semibold">98%</span>
+                  </div>
+                  <div class="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
+                    <div id="bar-undertone" class="bg-amber-400 h-1.5 rounded-full" style="width: 98%"></div>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="flex justify-between text-[11px] mb-1">
+                    <span class="text-stone-300">Silhouette & Proportion Balance</span>
+                    <span id="meter-silhouette" class="text-emerald-300 font-semibold">95%</span>
+                  </div>
+                  <div class="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
+                    <div id="bar-silhouette" class="bg-emerald-400 h-1.5 rounded-full" style="width: 95%"></div>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="flex justify-between text-[11px] mb-1">
+                    <span class="text-stone-300">Hardware & Accessory Balance</span>
+                    <span id="meter-hardware" class="text-rose-300 font-semibold">94%</span>
+                  </div>
+                  <div class="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
+                    <div id="bar-hardware" class="bg-rose-400 h-1.5 rounded-full" style="width: 94%"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-white/10 bg-white/5 rounded-xl p-3 text-xs text-stone-200">
+              <span class="text-[10px] font-bold text-amber-300 uppercase tracking-wider block mb-0.5">Stylist Verdict:</span>
+              <p id="mix-feedback-text" class="text-[11px] leading-relaxed">
+                The tailored silhouette balances your frame gracefully, and warm gold accents make your wheatish undertone radiate.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- TAB 6: EVENT STYLIST                                     -->
+    <!-- ======================================================== -->
+    <div id="tab-events" class="tab-view hidden space-y-6">
+      <div class="bg-white rounded-2xl p-5 sm:p-6 border border-stone-200 shadow-sm space-y-4">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-brand-700">Occasion Architecture</span>
+          <h2 class="font-serif text-2xl sm:text-3xl font-bold text-stone-900">Event & Celebration Stylist</h2>
+          <p class="text-xs sm:text-sm text-stone-500 mt-1">Calibrated for Sangeet/Cocktails, Weddings, Traditional Pujas, and High-Stakes Office Events.</p>
+        </div>
+
+        <!-- Event Type Pills -->
+        <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
+          <button onclick="filterEvent('sangeet')" id="ev-sangeet" class="ev-btn px-3 py-1.5 rounded-lg bg-brand-700 text-white font-semibold whitespace-nowrap">✨ Sangeet / Cocktail Party</button>
+          <button onclick="filterEvent('wedding')" id="ev-wedding" class="ev-btn px-3 py-1.5 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 font-medium whitespace-nowrap">💍 Wedding Ceremony</button>
+          <button onclick="filterEvent('puja')" id="ev-puja" class="ev-btn px-3 py-1.5 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 font-medium whitespace-nowrap">🪔 Festive / Puja</button>
+          <button onclick="filterEvent('presentation')" id="ev-presentation" class="ev-btn px-3 py-1.5 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 font-medium whitespace-nowrap">💼 Executive Presentation</button>
+        </div>
+
+        <!-- Event Details Box -->
+        <div id="event-display-container" class="space-y-4 pt-2">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- TAB 7: TRAVEL PACKING CAPSULE                            -->
+    <!-- ======================================================== -->
+    <div id="tab-travel" class="tab-view hidden space-y-6">
+      <div class="bg-white rounded-2xl p-5 sm:p-6 border border-stone-200 shadow-sm space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-brand-700">Trip Packing Multiplier</span>
+            <h2 class="font-serif text-2xl sm:text-3xl font-bold text-stone-900">Travel Wardrobe Capsule</h2>
+            <p class="text-xs sm:text-sm text-stone-500 mt-1">Maximize your outfits with minimum luggage. Never repeat an exact look twice.</p>
+          </div>
+          <div class="flex items-center gap-2 bg-stone-100 p-1 rounded-xl text-xs font-medium">
+            <button onclick="setTravelDays(3)" id="tday-3" class="px-3 py-1.5 rounded-lg bg-brand-700 text-white font-semibold">3-Day Getaway</button>
+            <button onclick="setTravelDays(5)" id="tday-5" class="px-3 py-1.5 rounded-lg text-stone-600 hover:text-stone-900">5-Day Vacation</button>
+          </div>
+        </div>
+
+        <div id="travel-capsule-display" class="space-y-4 pt-2">
+          <!-- Injected by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- TAB 8: INSIGHTS & SHOPPING MULTIPLIERS                   -->
+    <!-- ======================================================== -->
+    <div id="tab-insights" class="tab-view hidden space-y-6">
+      <!-- Unworn Pieces Alert & Closet Stats -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <!-- Unworn Pieces Alert -->
+        <div class="bg-amber-50/70 border border-amber-200 rounded-2xl p-5 space-y-3">
+          <div class="flex items-center gap-2 text-amber-900 font-bold text-sm">
+            <span>💡 Rediscover Unworn Pieces</span>
+          </div>
+          <p class="text-xs text-stone-600 leading-relaxed">
+            You haven't styled your **Emerald Green Anarkali Dress** or **Blush Rose Satin Slip** recently. Tap below to see fresh styling formulas that bring them back into regular rotation!
+          </p>
+          <div class="flex items-center gap-2 pt-1">
+            <button onclick="switchTab('flattery')" class="text-xs px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-semibold transition-colors">
+              View Styling Formulas
+            </button>
+          </div>
+        </div>
+
+        <!-- Cloud Sync & Data Management -->
+        <div class="bg-white border border-stone-200 rounded-2xl p-5 space-y-3 shadow-sm">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2 text-stone-900 font-bold text-sm">
+              <span>☁️ Cloud Storage & Sync</span>
+            </div>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold">Active & Synced</span>
+          </div>
+          <p class="text-xs text-stone-600 leading-relaxed">
+            Connected to your personal **Google Drive / iCloud Storage**. All your photos, items, and custom formulas are automatically backed up under your account.
+          </p>
+          <div class="flex items-center gap-2 pt-1">
+            <button onclick="exportWardrobeBackup()" class="text-xs px-3 py-1.5 rounded-lg border border-stone-300 hover:bg-stone-50 font-medium text-stone-700 transition-colors">
+              Export Backup JSON
+            </button>
+            <button onclick="printStylingDossier()" class="text-xs px-3 py-1.5 rounded-lg bg-brand-700 hover:bg-brand-800 text-white font-semibold transition-colors">
+              Print Styling Dossier
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Optional Shopping Multiplier Tab -->
+      <div class="bg-white rounded-2xl p-5 sm:p-6 border border-stone-200 shadow-sm space-y-4">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-brand-700">Optional Wardrobe Multiplier</span>
+          <h3 class="font-serif text-2xl font-bold text-stone-900">Key Gaps That Multiply Your Outfits</h3>
+          <p class="text-xs sm:text-sm text-stone-500 mt-1">
+            While daily styling strictly uses only what you already own, adding just 1 or 2 of these versatile staples would unlock 10+ new looks across your dresses. Curated for your skin tone and body shape:
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-1">
+          <!-- Item 1: Tan Pointed-Toe Flats -->
+          <div class="p-4 rounded-xl bg-stone-50 border border-stone-200 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-brand-800 uppercase tracking-wide">Footwear Multiplier</span>
+              <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-semibold">+8 Outfits</span>
+            </div>
+            <h4 class="font-serif font-bold text-stone-900 text-base">Tan / Nude Pointed Flat Mules</h4>
+            <p class="text-xs text-stone-600 leading-relaxed">
+              Elongates your legs with midi dresses and kurtis without adding uncomfortable heel height.
+            </p>
+            <div class="pt-1 flex items-center gap-2 text-xs">
+              <a href="https://www.myntra.com/pointed-flats" target="_blank" class="text-brand-700 hover:underline font-semibold">Myntra</a> •
+              <a href="https://www.ajio.com" target="_blank" class="text-brand-700 hover:underline font-semibold">Ajio</a> •
+              <a href="https://www.zara.com" target="_blank" class="text-brand-700 hover:underline font-semibold">Zara</a>
+            </div>
+          </div>
+
+          <!-- Item 2: Gold Minimalist Chain Belt -->
+          <div class="p-4 rounded-xl bg-stone-50 border border-stone-200 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-brand-800 uppercase tracking-wide">Waist Multiplier</span>
+              <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-semibold">+6 Outfits</span>
+            </div>
+            <h4 class="font-serif font-bold text-stone-900 text-base">Slim Gold Metal Chain Belt</h4>
+            <p class="text-xs text-stone-600 leading-relaxed">
+              Cinches shift dresses and anarkalis right at your narrowest waist, creating an instant hourglass visual line.
+            </p>
+            <div class="pt-1 flex items-center gap-2 text-xs">
+              <a href="https://www.nykaafashion.com" target="_blank" class="text-brand-700 hover:underline font-semibold">Nykaa Fashion</a> •
+              <a href="https://www.myntra.com/belts" target="_blank" class="text-brand-700 hover:underline font-semibold">Myntra</a>
+            </div>
+          </div>
+
+          <!-- Item 3: Terracotta Matte Bullet -->
+          <div class="p-4 rounded-xl bg-stone-50 border border-stone-200 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-brand-800 uppercase tracking-wide">Makeup Multiplier</span>
+              <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-semibold">+10 Outfits</span>
+            </div>
+            <h4 class="font-serif font-bold text-stone-900 text-base">Spiced Cinnamon Terracotta Lip</h4>
+            <p class="text-xs text-stone-600 leading-relaxed">
+              The holy grail shade for warm wheatish complexions—warms up neutral black and navy dresses effortlessly.
+            </p>
+            <div class="pt-1 flex items-center gap-2 text-xs">
+              <a href="https://www.nykaa.com" target="_blank" class="text-brand-700 hover:underline font-semibold">Nykaa</a> •
+              <a href="https://www.maccosmetics.in" target="_blank" class="text-brand-700 hover:underline font-semibold">MAC India</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ======================================================== -->
+  <!-- MOBILE BOTTOM QUICK DOCK (Sticky on Smartphones)          -->
+  <!-- ======================================================== -->
+  <div class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-stone-200 px-3 py-2 flex items-center justify-around text-[10px] font-medium text-stone-600 shadow-lg">
+    <button onclick="switchTab('today')" id="mob-today" class="mob-btn flex flex-col items-center gap-1 text-brand-700 font-bold">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+      <span>Today</span>
+    </button>
+    <button onclick="switchTab('closet')" id="mob-closet" class="mob-btn flex flex-col items-center gap-1">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+      <span>Closet</span>
+    </button>
+    <button onclick="switchTab('flattery')" id="mob-flattery" class="mob-btn flex flex-col items-center gap-1">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      <span>Flattery</span>
+    </button>
+    <button onclick="switchTab('outfits')" id="mob-outfits" class="mob-btn flex flex-col items-center gap-1">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+      <span>Looks</span>
+    </button>
+    <button onclick="switchTab('mixer')" id="mob-mixer" class="mob-btn flex flex-col items-center gap-1">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+      <span>Mixer</span>
+    </button>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL 1: PROFILE & PHOTO CUSTOMIZATION                   -->
+  <!-- ======================================================== -->
+  <div id="modal-profile" class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto shadow-2xl">
+      <div class="flex items-center justify-between border-b border-stone-200 pb-3">
+        <h3 class="font-serif text-xl font-bold text-stone-900">Your Styling Profile</h3>
+        <button onclick="closeProfileModal()" class="text-stone-400 hover:text-stone-700 text-xl font-bold">&times;</button>
+      </div>
+
+      <!-- Photo Upload & Detection -->
+      <div class="p-4 rounded-xl bg-stone-50 border border-stone-200 space-y-3 text-center">
+        <div class="w-20 h-20 mx-auto rounded-full bg-brand-100 border-2 border-brand-300 flex items-center justify-center text-3xl shadow-sm overflow-hidden" id="avatar-preview">
+          👩🏽
+        </div>
+        <div>
+          <label class="px-3 py-1.5 rounded-lg bg-stone-900 hover:bg-brand-900 text-white text-xs font-semibold cursor-pointer inline-flex items-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            <span>Upload Full-Length Photo</span>
+            <input type="file" accept="image/*" class="hidden" onchange="handlePhotoUpload(event)">
+          </label>
+          <p class="text-[11px] text-stone-500 mt-1">Automated scan detected: Warm Wheatish • Pear Frame</p>
+        </div>
+      </div>
+
+      <!-- Manual Overrides -->
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="font-bold text-stone-700 block mb-1">Skin Tone & Undertone Depth</label>
+          <select id="profile-skin" class="w-full bg-white border border-stone-300 rounded-lg p-2">
+            <option value="wheatish_warm">Medium to Wheatish (Warm Golden / Olive Undertone)</option>
+            <option value="fair_cool">Fair to Light (Cool Rosy Undertone)</option>
+            <option value="caramel_warm">Tan to Rich Caramel (Warm Bronze Undertone)</option>
+            <option value="deep_espresso">Deep Espresso (Rich Warm / Neutral Undertone)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="font-bold text-stone-700 block mb-1">Body Silhouette / Shape</label>
+          <select id="profile-shape" class="w-full bg-white border border-stone-300 rounded-lg p-2">
+            <option value="pear">Pear / Triangle (Hips and thighs wider than shoulders)</option>
+            <option value="hourglass">Hourglass (Defined narrow waist with balanced bust & hips)</option>
+            <option value="rectangle">Rectangle / Athletic (Balanced, subtle waist curve)</option>
+            <option value="apple">Apple / Inverted Triangle (Fuller bust/midsection, slender legs)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="font-bold text-stone-700 block mb-1">Height Frame</label>
+          <select id="profile-height" class="w-full bg-white border border-stone-300 rounded-lg p-2">
+            <option value="petite">Petite (Under 5 ft 3 in / 160 cm)</option>
+            <option value="moderate" selected>Moderate / Average (5 ft 3 in to 5 ft 7 in)</option>
+            <option value="tall">Tall / Statuesque (5 ft 8 in and above)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2 border-t border-stone-200">
+        <button onclick="closeProfileModal()" class="px-4 py-2 rounded-xl border border-stone-300 text-stone-700 text-xs font-semibold">Cancel</button>
+        <button onclick="saveProfile()" class="px-5 py-2 rounded-xl bg-brand-700 hover:bg-brand-800 text-white text-xs font-semibold">Save Profile</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL 2: ADD NEW ITEM TO CLOSET                          -->
+  <!-- ======================================================== -->
+  <div id="modal-add-item" class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto shadow-2xl">
+      <div class="flex items-center justify-between border-b border-stone-200 pb-3">
+        <h3 class="font-serif text-xl font-bold text-stone-900">Add Item to Your Wardrobe</h3>
+        <button onclick="closeAddItemModal()" class="text-stone-400 hover:text-stone-700 text-xl font-bold">&times;</button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="font-bold text-stone-700 block mb-1">Item Category</label>
+          <select id="new-item-cat" class="w-full bg-white border border-stone-300 rounded-lg p-2">
+            <option value="dresses">Dress or Outfit (Western / Ethnic)</option>
+            <option value="shoes">Shoes / Footwear</option>
+            <option value="bags">Handbag / Purse</option>
+            <option value="jewelry">Jewelry Accent</option>
+            <option value="layers">Outerwear / Layer (Blazer, Jacket)</option>
+            <option value="makeup">Makeup (Lipstick, Liner)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="font-bold text-stone-700 block mb-1">Item Name / Title</label>
+          <input type="text" id="new-item-name" placeholder="e.g. Navy Floral Tiered Midi Dress" class="w-full bg-white border border-stone-300 rounded-lg p-2 focus:ring-2 focus:ring-brand-500 focus:outline-none">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="font-bold text-stone-700 block mb-1">Primary Color</label>
+            <input type="text" id="new-item-color" placeholder="e.g. Navy / Emerald / Tan" class="w-full bg-white border border-stone-300 rounded-lg p-2">
+          </div>
+          <div>
+            <label class="font-bold text-stone-700 block mb-1">Fabric or Finish</label>
+            <input type="text" id="new-item-fabric" placeholder="e.g. Cotton / Satin / Matte" class="w-full bg-white border border-stone-300 rounded-lg p-2">
+          </div>
+        </div>
+
+        <!-- Photo Upload Box -->
+        <div class="p-4 rounded-xl border-2 border-dashed border-stone-300 text-center space-y-1 bg-stone-50">
+          <svg class="w-6 h-6 mx-auto text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          <span class="text-xs text-stone-600 font-medium block">Upload Photo or Auto-Cutout</span>
+          <input type="file" id="new-item-photo" accept="image/*" class="text-xs text-stone-500 file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-brand-100 file:text-brand-800">
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2 border-t border-stone-200">
+        <button onclick="closeAddItemModal()" class="px-4 py-2 rounded-xl border border-stone-300 text-stone-700 text-xs font-semibold">Cancel</button>
+        <button onclick="saveNewItem()" class="px-5 py-2 rounded-xl bg-brand-700 hover:bg-brand-800 text-white text-xs font-semibold">Add to Wardrobe</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL 3: SHAREABLE LOOK CARD PREVIEW                     -->
+  <!-- ======================================================== -->
+  <div id="modal-share" class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-stone-200 pb-3">
+        <h3 class="font-serif text-lg font-bold text-stone-900">Share Your Look</h3>
+        <button onclick="closeShareModal()" class="text-stone-400 hover:text-stone-700 text-xl font-bold">&times;</button>
+      </div>
+
+      <!-- Card Canvas Snapshot -->
+      <div id="share-card-content" class="bg-gradient-to-br from-[#FAF7F5] to-amber-50/50 p-5 rounded-2xl border border-stone-200 space-y-3 text-stone-800">
+        <!-- Injected by JS -->
+      </div>
+
+      <div class="flex items-center justify-between gap-2 pt-2 border-t border-stone-200">
+        <button onclick="copyShareText()" id="btn-copy-share" class="flex-1 py-2 rounded-xl border border-stone-300 hover:bg-stone-50 text-xs font-semibold text-stone-700 transition-colors">
+          📋 Copy Outfit Details
+        </button>
+        <button onclick="closeShareModal()" class="px-4 py-2 rounded-xl bg-brand-700 hover:bg-brand-800 text-white text-xs font-semibold">
+          Done
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- SCRIPT: APPLICATION STATE & ENGINE                       -->
+  <!-- ======================================================== -->
+  <script>
+    // --- USER PROFILE STATE ---
+    let profile = {
+      skinTone: 'wheatish_warm',
+      undertone: 'Warm Golden Olive',
+      shape: 'pear',
+      shapeName: 'Pear / Triangle Frame',
+      height: 'moderate',
+      heightName: '5 ft 4 in (Moderate)'
+    };
+
+    let activeTab = 'today';
+    let currentVibe = 'office';
+    let climateMode = 'ac';
+    let makeupMode = 'glam';
+    let currentEvent = 'sangeet';
+    let travelDays = 3;
+
+    // --- WARDROBE DATABASE (Initial Closet) ---
+    let wardrobe = [
+      // DRESSES & OUTFITS
+      { id: 'd1', cat: 'dresses', name: 'Terracotta Wrap Midi Dress', color: 'Terracotta', fabric: 'Crepe Viscose', cut: 'Wrap V-Neck', flattery: 'high', score: 96, pros: 'V-neck elongates upper torso; waist wrap highlights narrowest waistline.', cons: 'None; gold jewelry pairs seamlessly.', rescue: 'Wear with nude block heels and gold hoops.' },
+      { id: 'd2', cat: 'dresses', name: 'Emerald Green A-Line Anarkali Kurti', color: 'Emerald Green', fabric: 'Chanderi Silk', cut: 'A-Line Flowing', flattery: 'high', score: 98, pros: 'Jewel green flatters warm olive undertone; flowing flare glides gracefully over hips.', cons: 'None.', rescue: 'Pair with statement jhumkas and pointed flat juttis.' },
+      { id: 'd3', cat: 'dresses', name: 'Black Tailored Sheath Midi Dress', color: 'Classic Black', fabric: 'Ponte Knit', cut: 'Straight Sheath', flattery: 'partial', score: 82, pros: 'Sleek professional column line.', cons: 'Straight cut can cling to hips; solid black can look severe against warm skin without warm makeup.', rescue: 'Layer a structured open blazer to create vertical side panels, and apply warm cinnamon terracotta lipstick + gold hoops to warm up the face.' },
+      { id: 'd4', cat: 'dresses', name: 'Blush Pink Satin Slip Dress', color: 'Blush Pink', fabric: 'Silk Satin', cut: 'Bias Slip', flattery: 'partial', score: 79, pros: 'Lustrous texture and elegant fluid drape.', cons: 'Cool pastel pink can wash out warm wheatish skin; bias cut clings to lower hips.', rescue: 'Throw a cropped denim jacket over shoulders to break the pastel wash, cinch with a slim gold chain belt, and wear a defined berry lip.' },
+      { id: 'd5', cat: 'dresses', name: 'Mustard Saffron Tiered Maxi Dress', color: 'Mustard Yellow', fabric: 'Cotton Linen', cut: 'Tiered Maxi', flattery: 'high', score: 95, pros: 'Warm saffron brings out a radiant golden glow; tiered A-line flare balances lower proportions.', cons: 'Maxi hemline needs defined ankles.', rescue: 'Pair with tan pointed flat mules and minimal pearl studs.' },
+      { id: 'd6', cat: 'dresses', name: 'Navy Blue Floral Fit-and-Flare Dress', color: 'Navy / Floral', fabric: 'Georgette', cut: 'Fit-and-Flare', flattery: 'high', score: 94, pros: 'Classic fit-and-flare celebrates waist and gives hips gentle movement.', cons: 'None.', rescue: 'Style with white sneakers for day brunch, or block heels for evening.' },
+      { id: 'd7', cat: 'dresses', name: 'Beige Relaxed Linen Shirt Dress', color: 'Warm Beige', fabric: 'Linen', cut: 'Loose Shirt Shift', flattery: 'partial', score: 76, pros: 'Ultra-breathable and chic casual aesthetic.', cons: 'Loose boxy shift cut hides your waist completely and adds bulk around hips.', rescue: 'Unbutton top 2 buttons to form an elongating V-neck, roll up sleeves to elbows, and add a wide cognac leather belt right at your natural waist.' },
+      { id: 'd8', cat: 'dresses', name: 'Royal Sapphire Blue Evening Gown', color: 'Sapphire Navy', fabric: 'Crepe Velvet', cut: 'Sweetheart Slit', flattery: 'high', score: 95, pros: 'Rich sapphire creates high visual contrast; sweetheart neckline opens collarbones.', cons: 'Requires metallic shoes to avoid darkness.', rescue: 'Pair with metallic block heels and bold red lip.' },
+
+      // FOOTWEAR
+      { id: 's1', cat: 'shoes', name: 'Tan Leather Block Heels', color: 'Tan', type: 'Heels (2 inch)', style: 'Elevated' },
+      { id: 's2', cat: 'shoes', name: 'Pointed-Toe Nude Flat Mules', color: 'Nude Tan', type: 'Pointed Flats', style: 'Comfort Elongating' },
+      { id: 's3', cat: 'shoes', name: 'Clean Minimalist White Sneakers', color: 'White', type: 'Sneakers', style: 'Casual High-Low' },
+      { id: 's4', cat: 'shoes', name: 'Gold Embroidered Juttis', color: 'Gold / Champagne', type: 'Ethnic Flats', style: 'Festive' },
+
+      // HANDBAGS
+      { id: 'b1', cat: 'bags', name: 'Structured Cognac Leather Work Tote', color: 'Cognac Brown', capacity: 'Work / Laptop' },
+      { id: 'b2', cat: 'bags', name: 'Compact Black Leather Crossbody', color: 'Black / Gold Buckle', capacity: 'Hands-Free' },
+      { id: 'b3', cat: 'bags', name: 'Champagne Metallic Evening Clutch', color: 'Champagne Gold', capacity: 'Evening' },
+
+      // JEWELRY
+      { id: 'j1', cat: 'jewelry', name: 'Polished Yellow Gold Chunky Hoops', metal: 'Yellow Gold', style: 'Everyday Chic' },
+      { id: 'j2', cat: 'jewelry', name: 'Traditional Kundan & Pearl Jhumkas', metal: 'Antique Gold', style: 'Festive Statement' },
+      { id: 'j3', cat: 'jewelry', name: 'Minimalist Freshwater Pearl Studs', metal: 'Gold / Pearl', style: 'Understated Classic' },
+      { id: 'j4', cat: 'jewelry', name: 'Layered Delicate Gold Chain Pendant', metal: 'Yellow Gold', style: 'Neckline Elongator' },
+
+      // OUTERWEAR & LAYERS
+      { id: 'l1', cat: 'layers', name: 'Tailored Camel Structured Blazer', color: 'Warm Camel', style: 'Office & AC Chic' },
+      { id: 'l2', cat: 'layers', name: 'Cropped Mid-Wash Denim Jacket', color: 'Denim Blue', style: 'Casual Waist Defining' },
+      { id: 'l3', cat: 'layers', name: 'Flowing Silk Kimono Duster', color: 'Olive & Gold', style: 'Graceful Column' },
+
+      // MAKEUP (LIPSTICKS & LINERS)
+      { id: 'm1', cat: 'makeup', name: 'Warm Terracotta Spiced Brick Lipstick', type: 'Lipstick', finish: 'Velvet Matte', undertone: 'Warm Power Shade' },
+      { id: 'm2', cat: 'makeup', name: 'Peachy Nude Hydrating Bullet Lipstick', type: 'Lipstick', finish: 'Satin Comfort', undertone: 'Everyday Nude' },
+      { id: 'm3', cat: 'makeup', name: 'Classic Crimson Ruby Red Lipstick', type: 'Lipstick', finish: 'Bold Matte', undertone: 'Statement Glam' },
+      { id: 'm4', cat: 'makeup', name: 'Deep Mulberry Berry Wine Lipstick', type: 'Lipstick', finish: 'Creamy Satin', undertone: 'Evening Rich' },
+      { id: 'm5', cat: 'makeup', name: 'Precision Black Liquid Eyeliner', type: 'Liner', finish: 'Sharp Winged', style: 'Defined Lift' },
+      { id: 'm6', cat: 'makeup', name: 'Smudgeable Deep Brown Kohl Kajal', type: 'Liner', finish: 'Soft Smudged', style: 'Everyday Simple' }
+    ];
+
+    // ========================================================
+    // TAB SWITCHING
+    // ========================================================
+    function switchTab(tabKey) {
+      activeTab = tabKey;
+
+      // Update mobile buttons
+      const mobKeys = ['today', 'closet', 'flattery', 'outfits', 'mixer'];
+      mobKeys.forEach(k => {
+        const btn = document.getElementById('mob-' + k);
+        if (btn) {
+          if (k === tabKey) {
+            btn.className = 'mob-btn flex flex-col items-center gap-1 text-brand-700 font-bold';
+          } else {
+            btn.className = 'mob-btn flex flex-col items-center gap-1 text-stone-500 font-medium';
+          }
+        }
+      });
+
+      // Update desktop buttons
+      const dtabKeys = ['today', 'closet', 'flattery', 'outfits', 'mixer', 'events', 'travel', 'insights'];
+      dtabKeys.forEach(k => {
+        const btn = document.getElementById('dtab-' + k);
+        if (btn) {
+          if (k === tabKey) {
+            btn.className = 'dtab-btn px-3 py-1.5 rounded-lg bg-brand-700 text-white font-semibold';
+          } else {
+            btn.className = 'dtab-btn px-3 py-1.5 rounded-lg hover:bg-stone-100 text-stone-700 font-medium';
+          }
+        }
+      });
+
+      // Hide all tabs & show active
+      document.querySelectorAll('.tab-view').forEach(el => el.classList.add('hidden'));
+      const activeEl = document.getElementById('tab-' + tabKey);
+      if (activeEl) activeEl.classList.remove('hidden');
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // Trigger specific renders if needed
+      if (tabKey === 'today') renderTodayOutfit();
+      if (tabKey === 'closet') renderCloset('all');
+      if (tabKey === 'flattery') renderFlatteryCards();
+      if (tabKey === 'outfits') renderOutfitsGrid();
+      if (tabKey === 'mixer') populateMixerDropdowns();
+      if (tabKey === 'events') renderEventDisplay();
+      if (tabKey === 'travel') renderTravelCapsule();
+    }
+
+    // ========================================================
+    // TODAY'S OUTFIT GENERATOR
+    // ========================================================
+    let todayIndex = 0;
+    const todayOptions = [
+      {
+        vibe: 'office',
+        title: 'The Polished Executive Wrap',
+        dress: 'Terracotta Wrap Midi Dress',
+        shoesComfort: 'Pointed-Toe Nude Flat Mules (Comfort Walk)',
+        shoesElevated: 'Tan Leather Block Heels (2 inch)',
+        layer: 'Tailored Camel Structured Blazer (pushed up to elbows)',
+        bag: 'Structured Cognac Leather Work Tote',
+        jewelry: 'Polished Yellow Gold Chunky Hoops + Delicate Chain',
+        makeupSimple: 'Peachy Nude Satin Lip + Soft Brown Kohl Liner + Tinted Brow Gel',
+        makeupGlam: 'Warm Terracotta Velvet Lip + Defined Winged Black Liner + Warm Peach Blush',
+        hair: 'Chic low bun or neat claw clip (opens up the collarbones)',
+        why: 'The wrap V-neck elongates your torso while the structured camel blazer sharpens the shoulders, creating an instant balanced silhouette for AC offices.'
+      },
+      {
+        vibe: 'casual',
+        title: 'The French-Chic Brunch Flow',
+        dress: 'Navy Blue Floral Fit-and-Flare Dress',
+        shoesComfort: 'Clean Minimalist White Sneakers',
+        shoesElevated: 'Pointed-Toe Nude Flat Mules',
+        layer: 'Cropped Mid-Wash Denim Jacket thrown over shoulders',
+        bag: 'Compact Black Leather Crossbody',
+        jewelry: 'Minimalist Freshwater Pearl Studs',
+        makeupSimple: 'Peachy Nude Lip Balm + Curled Lashes + Sheer Golden Highlighter',
+        makeupGlam: 'Classic Ruby Red Lip + Subtle Cat-Eye Liner + Sunkissed Bronze Flush',
+        hair: 'Effortless soft waves with a half-up twist',
+        why: 'The high-low contrast of a feminine floral dress with clean white sneakers gives supreme all-day comfort without sacrificing elegance.'
+      },
+      {
+        vibe: 'festive',
+        title: 'The Emerald Royal Grace',
+        dress: 'Emerald Green A-Line Anarkali Kurti',
+        shoesComfort: 'Gold Embroidered Juttis',
+        shoesElevated: 'Tan Leather Block Heels',
+        layer: 'Flowing Silk Kimono Duster (optional evening drape)',
+        bag: 'Champagne Metallic Evening Clutch',
+        jewelry: 'Traditional Kundan & Pearl Jhumkas (One Hero Piece rule)',
+        makeupSimple: 'Warm Terracotta Lip Stain + Kajal Tightline',
+        makeupGlam: 'Warm Terracotta Matte Lip + Defined Kohl Wings + Golden Champagne Glow',
+        hair: 'Middle-parted sleek low ponytail or jasmine-pinned bun',
+        why: 'Emerald green is the supreme jewel tone for warm golden wheatish undertones, reflecting vibrant radiant light directly onto the face.'
+      },
+      {
+        vibe: 'party',
+        title: 'The Sapphire Night Glamour',
+        dress: 'Royal Sapphire Blue Evening Gown',
+        shoesComfort: 'Pointed-Toe Nude Flat Mules',
+        shoesElevated: 'Tan Leather Block Heels with Gold Buckles',
+        layer: 'Tailored Camel Structured Blazer draped on shoulders',
+        bag: 'Champagne Metallic Evening Clutch',
+        jewelry: 'Polished Yellow Gold Chunky Hoops',
+        makeupSimple: 'Peachy Nude Gloss + Smudged Brown Liner',
+        makeupGlam: 'Classic Crimson Ruby Red Lip + Sharp Black Liquid Wing + Golden Cheekbone Highlight',
+        hair: 'Side-swept Hollywood blowout waves',
+        why: 'Deep sapphire blue against warm golden jewelry creates an expensive, high-contrast evening presence under ambient restaurant lighting.'
+      }
+    ];
+
+    function renderTodayOutfit() {
+      const container = document.getElementById('today-outfit-container');
+      const filtered = todayOptions.filter(o => o.vibe === currentVibe);
+      const look = filtered[todayIndex % filtered.length] || todayOptions[0];
+
+      const makeupChoice = makeupMode === 'simple' ? look.makeupSimple : look.makeupGlam;
+
+      container.innerHTML = `
+        <div class="bg-white rounded-2xl p-5 sm:p-7 border border-stone-200 shadow-sm space-y-5">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-stone-100 pb-4">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-brand-100 text-brand-800 border border-brand-200 uppercase tracking-wide">Today's Recommended Look</span>
+                <span class="text-xs font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded">97% Flattery Synergy</span>
+              </div>
+              <h3 class="font-serif text-2xl font-bold text-stone-900 mt-1">${look.title}</h3>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="openShareModal('${look.title}', '${look.dress}', '${look.shoesElevated}', '${look.bag}', '${look.jewelry}', '${makeupChoice}')" class="text-xs px-3 py-1.5 rounded-lg border border-stone-300 hover:bg-stone-50 text-stone-700 font-semibold transition-colors flex items-center gap-1.5">
+                <svg class="w-4 h-4 text-brand-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+                <span>Share Look</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- The Head-to-Toe Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 text-xs">
+            <div class="p-3.5 rounded-xl bg-stone-50 border border-stone-200">
+              <span class="text-[10px] font-bold uppercase text-brand-700 tracking-wider block mb-1">👗 1. The Foundation Dress</span>
+              <p class="font-bold text-stone-900 text-sm">${look.dress}</p>
+              <p class="text-[11px] text-stone-500 mt-0.5">From your uploaded wardrobe</p>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-stone-50 border border-stone-200">
+              <span class="text-[10px] font-bold uppercase text-brand-700 tracking-wider block mb-1">🧥 2. Layering Piece</span>
+              <p class="font-bold text-stone-900 text-sm">${look.layer}</p>
+              <p class="text-[11px] text-stone-500 mt-0.5">${climateMode === 'ac' ? 'AC Office calibrated' : 'Outdoor breathable'}</p>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-stone-50 border border-stone-200">
+              <span class="text-[10px] font-bold uppercase text-brand-700 tracking-wider block mb-1">👠 3. Footwear Choice</span>
+              <p class="font-bold text-stone-900 text-sm">${look.shoesElevated}</p>
+              <p class="text-[11px] text-emerald-800 font-medium mt-0.5">Alt: ${look.shoesComfort}</p>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-stone-50 border border-stone-200">
+              <span class="text-[10px] font-bold uppercase text-brand-700 tracking-wider block mb-1">👜 4. Handbag</span>
+              <p class="font-bold text-stone-900 text-sm">${look.bag}</p>
+              <p class="text-[11px] text-stone-500 mt-0.5">Matches shoe and jewelry hardware</p>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-stone-50 border border-stone-200">
+              <span class="text-[10px] font-bold uppercase text-brand-700 tracking-wider block mb-1">💍 5. Jewelry Accent</span>
+              <p class="font-bold text-stone-900 text-sm">${look.jewelry}</p>
+              <p class="text-[11px] text-stone-500 mt-0.5">One-Hero Piece balance rule</p>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-brand-50/70 border border-brand-200">
+              <span class="text-[10px] font-bold uppercase text-brand-800 tracking-wider block mb-1">💄 6. Makeup & Liner</span>
+              <p class="font-bold text-brand-900 text-sm">${makeupChoice}</p>
+              <p class="text-[11px] text-stone-500 mt-0.5">Mode: ${makeupMode === 'simple' ? 'Simple 5-Min' : 'Full Glam'}</p>
+            </div>
+          </div>
+
+          <!-- Stylist Secret Box -->
+          <div class="bg-amber-50/60 border border-amber-200/80 rounded-xl p-3.5 text-xs space-y-1">
+            <div class="flex items-center gap-1.5 text-amber-900 font-bold">
+              <span>💡 Why This Proportion Works For You:</span>
+            </div>
+            <p class="text-stone-700 leading-relaxed">${look.why}</p>
+            <p class="text-[11px] text-stone-500 pt-1"><strong>Hairstyle Tip:</strong> ${look.hair}</p>
+          </div>
+        </div>
+      `;
+    }
+
+    function setVibe(vibeKey) {
+      currentVibe = vibeKey;
+      todayIndex = 0;
+      document.querySelectorAll('.vibe-btn').forEach(btn => {
+        btn.className = 'vibe-btn px-3 py-1 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-700 font-medium whitespace-nowrap';
+      });
+      const active = document.getElementById('vibe-' + vibeKey);
+      if (active) active.className = 'vibe-btn px-3 py-1 rounded-full bg-brand-700 text-white font-semibold whitespace-nowrap';
+      renderTodayOutfit();
+    }
+
+    function setClimateMode(mode) {
+      climateMode = mode;
+      document.getElementById('climate-ac').className = mode === 'ac' ? 'px-2.5 py-1 rounded-lg bg-white/20 text-white font-medium' : 'px-2.5 py-1 rounded-lg text-stone-300 hover:text-white font-medium';
+      document.getElementById('climate-outdoor').className = mode === 'outdoor' ? 'px-2.5 py-1 rounded-lg bg-white/20 text-white font-medium' : 'px-2.5 py-1 rounded-lg text-stone-300 hover:text-white font-medium';
+      renderTodayOutfit();
+    }
+
+    function shuffleTodayOutfit() {
+      todayIndex++;
+      renderTodayOutfit();
+    }
+
+    function toggleMakeupMode(mode) {
+      makeupMode = mode;
+      document.getElementById('mmode-simple').className = mode === 'simple' ? 'px-2.5 py-1 rounded-lg bg-brand-700 text-white font-semibold' : 'px-2.5 py-1 rounded-lg bg-stone-100 text-stone-700';
+      document.getElementById('mmode-glam').className = mode === 'glam' ? 'px-2.5 py-1 rounded-lg bg-brand-700 text-white font-semibold' : 'px-2.5 py-1 rounded-lg bg-stone-100 text-stone-700';
+      if (activeTab === 'today') renderTodayOutfit();
+      if (activeTab === 'outfits') renderOutfitsGrid();
+    }
+
+    // ========================================================
+    // DIGITAL CLOSET VIEW
+    // ========================================================
+    function filterCloset(cat) {
+      document.querySelectorAll('.closet-nav-btn').forEach(b => {
+        b.className = 'closet-nav-btn px-3 py-1.5 rounded-lg bg-white border border-stone-200 hover:bg-stone-50 text-stone-700 font-medium whitespace-nowrap';
+      });
+      const active = document.getElementById('closet-tab-' + cat);
+      if (active) active.className = 'closet-nav-btn px-3 py-1.5 rounded-lg bg-brand-700 text-white font-semibold whitespace-nowrap';
+      renderCloset(cat);
+    }
+
+    function renderCloset(filterCat) {
+      const grid = document.getElementById('closet-items-grid');
+      const items = filterCat === 'all' ? wardrobe : wardrobe.filter(i => i.cat === filterCat);
+
+      let html = '';
+      items.forEach(item => {
+        let badgeColor = 'bg-stone-100 text-stone-700';
+        if (item.cat === 'dresses') badgeColor = 'bg-rose-50 text-rose-800 border-rose-200';
+        if (item.cat === 'shoes') badgeColor = 'bg-emerald-50 text-emerald-800 border-emerald-200';
+        if (item.cat === 'jewelry') badgeColor = 'bg-amber-50 text-amber-800 border-amber-200';
+        if (item.cat === 'makeup') badgeColor = 'bg-purple-50 text-purple-800 border-purple-200';
+
+        html += `
+          <div class="bg-white rounded-xl p-3 border border-stone-200 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
+            <div class="space-y-2">
+              <div class="w-full aspect-square rounded-lg bg-stone-50 border border-stone-100 flex items-center justify-center text-3xl overflow-hidden relative">
+                ${item.cat === 'dresses' ? '👗' : item.cat === 'shoes' ? '👠' : item.cat === 'bags' ? '👜' : item.cat === 'jewelry' ? '💍' : item.cat === 'layers' ? '🧥' : '💄'}
+                <span class="absolute top-1.5 right-1.5 text-[9px] font-bold px-1.5 py-0.5 rounded border ${badgeColor}">
+                  ${item.cat}
+                </span>
+              </div>
+              <div>
+                <h4 class="font-bold text-stone-900 text-xs line-clamp-1">${item.name}</h4>
+                <p class="text-[10px] text-stone-500 mt-0.5">${item.color || item.metal || item.type} • ${item.fabric || item.style || item.finish || 'Custom'}</p>
+              </div>
+            </div>
+            <div class="pt-2 mt-2 border-t border-stone-100 flex items-center justify-between text-[10px]">
+              <span class="text-stone-400 font-medium">Synced</span>
+              <button onclick="deleteItem('${item.id}')" class="text-stone-400 hover:text-red-600 transition-colors">✕</button>
+            </div>
+          </div>
+        `;
+      });
+
+      // Quick "+ Add More" card
+      html += `
+        <div onclick="openAddItemModal()" class="cursor-pointer border-2 border-dashed border-stone-300 hover:border-brand-500 hover:bg-brand-50/30 rounded-xl p-4 flex flex-col items-center justify-center text-center space-y-1 transition-all">
+          <div class="w-8 h-8 rounded-full bg-brand-100 text-brand-800 flex items-center justify-center text-base font-bold">+</div>
+          <span class="text-xs font-bold text-stone-800">Add Item</span>
+          <span class="text-[10px] text-stone-400">Photo / Manual</span>
+        </div>
+      `;
+
+      grid.innerHTML = html;
+    }
+
+    function deleteItem(itemId) {
+      wardrobe = wardrobe.filter(i => i.id !== itemId);
+      renderCloset('all');
+    }
+
+    // ========================================================
+    // FLATTERY VERDICTS & RESCUE STYLING
+    // ========================================================
+    function renderFlatteryCards() {
+      const container = document.getElementById('flattery-cards-container');
+      const dresses = wardrobe.filter(i => i.cat === 'dresses');
+
+      let html = '';
+      dresses.forEach(dress => {
+        const isHigh = dress.flattery === 'high';
+        const badge = isHigh
+          ? '<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">✨ Highly Flattering</span>'
+          : '<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-200">⚖️ Partially Flattering / Needs Balance</span>';
+
+        html += `
+          <div class="bg-white rounded-2xl p-5 sm:p-6 border border-stone-200 shadow-sm space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-stone-100 pb-3">
+              <div>
+                <div class="flex items-center gap-2">
+                  ${badge}
+                  <span class="text-xs font-bold text-stone-500">Flattery Score: ${dress.score}%</span>
+                </div>
+                <h3 class="font-serif text-xl font-bold text-stone-900 mt-1">${dress.name}</h3>
+                <p class="text-xs text-stone-500">${dress.color} • ${dress.fabric} • Cut: ${dress.cut}</p>
+              </div>
+              <button onclick="switchTab('mixer')" class="text-xs px-3 py-1.5 rounded-lg border border-stone-300 hover:bg-stone-50 font-semibold text-stone-700 transition-colors self-start sm:self-auto">
+                Mix in Studio
+              </button>
+            </div>
+
+            <!-- The Why Breakdown -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5 text-xs">
+              <div class="p-3.5 rounded-xl bg-emerald-50/50 border border-emerald-200/70 space-y-1">
+                <span class="font-bold text-emerald-900 uppercase text-[10px] tracking-wide block">✅ Why It Works For Your Silhouette:</span>
+                <p class="text-stone-700 leading-relaxed">${dress.pros}</p>
+              </div>
+
+              <div class="p-3.5 rounded-xl bg-amber-50/50 border border-amber-200/70 space-y-1">
+                <span class="font-bold text-amber-950 uppercase text-[10px] tracking-wide block">⚠️ The Challenge / Why It Needs Care:</span>
+                <p class="text-stone-700 leading-relaxed">${dress.cons}</p>
+              </div>
+            </div>
+
+            <!-- Rescue Formula -->
+            <div class="p-3.5 rounded-xl bg-brand-50/60 border border-brand-200 text-xs space-y-1">
+              <span class="font-bold text-brand-900 uppercase text-[10px] tracking-wider block">🛠️ Stylist Rescue Formula (How to Style It Anyway):</span>
+              <p class="text-stone-800 leading-relaxed font-medium">${dress.rescue}</p>
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    // ========================================================
+    // CURATED HEAD-TO-TOE LOOKS
+    // ========================================================
+    function renderOutfitsGrid() {
+      const grid = document.getElementById('outfits-cards-grid');
+
+      let html = '';
+      todayOptions.forEach((look, idx) => {
+        const makeup = makeupMode === 'simple' ? look.makeupSimple : look.makeupGlam;
+
+        html += `
+          <div class="bg-white rounded-2xl p-5 border border-stone-200 shadow-sm hover:shadow-md transition-shadow space-y-4 flex flex-col justify-between">
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-brand-100 text-brand-800 uppercase tracking-wide">Look ${idx + 1}</span>
+                <span class="text-xs font-semibold text-emerald-800">96% Flattery Match</span>
+              </div>
+              <h3 class="font-serif text-xl font-bold text-stone-900">${look.title}</h3>
+
+              <div class="space-y-2 text-xs">
+                <div class="flex items-start gap-2">
+                  <span class="text-stone-400 font-bold uppercase w-16 flex-shrink-0">Dress:</span>
+                  <span class="text-stone-900 font-bold">${look.dress}</span>
+                </div>
+                <div class="flex items-start gap-2">
+                  <span class="text-stone-400 font-bold uppercase w-16 flex-shrink-0">Layer:</span>
+                  <span class="text-stone-800">${look.layer}</span>
+                </div>
+                <div class="flex items-start gap-2">
+                  <span class="text-stone-400 font-bold uppercase w-16 flex-shrink-0">Shoes:</span>
+                  <span class="text-stone-800">${look.shoesElevated} <span class="text-stone-400">(or ${look.shoesComfort})</span></span>
+                </div>
+                <div class="flex items-start gap-2">
+                  <span class="text-stone-400 font-bold uppercase w-16 flex-shrink-0">Jewelry:</span>
+                  <span class="text-stone-800">${look.jewelry}</span>
+                </div>
+                <div class="flex items-start gap-2">
+                  <span class="text-stone-400 font-bold uppercase w-16 flex-shrink-0">Bag:</span>
+                  <span class="text-stone-800">${look.bag}</span>
+                </div>
+                <div class="flex items-start gap-2">
+                  <span class="text-stone-400 font-bold uppercase w-16 flex-shrink-0">Makeup:</span>
+                  <span class="text-brand-900 font-semibold">${makeup}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="pt-2 border-t border-stone-100 flex items-center justify-between">
+              <span class="text-[10px] text-stone-400">Strictly owned pieces</span>
+              <button onclick="openShareModal('${look.title}', '${look.dress}', '${look.shoesElevated}', '${look.bag}', '${look.jewelry}', '${makeup}')" class="text-xs font-semibold text-brand-700 hover:underline">
+                Share Look &rarr;
+              </button>
+            </div>
+          </div>
+        `;
+      });
+
+      grid.innerHTML = html;
+    }
+
+    // ========================================================
+    // CLOSET MIXER DROPDOWNS & LOGIC
+    // ========================================================
+    function populateMixerDropdowns() {
+      const dressEl = document.getElementById('mix-dress');
+      const layerEl = document.getElementById('mix-layer');
+      const shoeEl = document.getElementById('mix-shoes');
+      const jewEl = document.getElementById('mix-jewelry');
+      const bagEl = document.getElementById('mix-bag');
+      const lipEl = document.getElementById('mix-lip');
+
+      dressEl.innerHTML = wardrobe.filter(i => i.cat === 'dresses').map(d => `<option value="${d.id}">${d.name}</option>`).join('');
+      layerEl.innerHTML = '<option value="none">No Layering (Stand-alone)</option>' + wardrobe.filter(i => i.cat === 'layers').map(l => `<option value="${l.id}">${l.name}</option>`).join('');
+      shoeEl.innerHTML = wardrobe.filter(i => i.cat === 'shoes').map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+      jewEl.innerHTML = wardrobe.filter(i => i.cat === 'jewelry').map(j => `<option value="${j.id}">${j.name}</option>`).join('');
+      bagEl.innerHTML = wardrobe.filter(i => i.cat === 'bags').map(b => `<option value="${b.id}">${b.name}</option>`).join('');
+      lipEl.innerHTML = wardrobe.filter(i => i.cat === 'makeup' && i.type === 'Lipstick').map(m => `<option value="${m.id}">${m.name}</option>`).join('');
+
+      calcMixerScore();
+    }
+
+    function calcMixerScore() {
+      const dressId = document.getElementById('mix-dress').value;
+      const dress = wardrobe.find(i => i.id === dressId) || wardrobe[0];
+      const layerId = document.getElementById('mix-layer').value;
+      const shoeId = document.getElementById('mix-shoes').value;
+      const jewId = document.getElementById('mix-jewelry').value;
+      const lipId = document.getElementById('mix-lip').value;
+
+      let score = dress.score || 90;
+      let feedback = dress.pros;
+
+      if (dress.flattery === 'partial') {
+        if (layerId !== 'none' || jewId.includes('j1')) {
+          score = Math.min(97, score + 12);
+          feedback = 'Brilliant rescue! Adding this layer and gold jewelry balances the silhouette and warms up your complexion perfectly.';
+        } else {
+          feedback = dress.cons + ' Tip: ' + dress.rescue;
+        }
+      }
+
+      document.getElementById('mix-score-num').textContent = score;
+      document.getElementById('meter-undertone').textContent = Math.min(99, score + 1) + '%';
+      document.getElementById('meter-silhouette').textContent = score + '%';
+      document.getElementById('meter-hardware').textContent = Math.max(90, score - 2) + '%';
+
+      document.getElementById('bar-undertone').style.width = Math.min(99, score + 1) + '%';
+      document.getElementById('bar-silhouette').style.width = score + '%';
+      document.getElementById('bar-hardware').style.width = Math.max(90, score - 2) + '%';
+
+      document.getElementById('mix-feedback-text').textContent = feedback;
+
+      const badge = document.getElementById('mix-verdict-badge');
+      if (score >= 93) {
+        badge.textContent = '🌟 Exceptional Harmony';
+        badge.className = 'px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
+      } else {
+        badge.textContent = '⚖️ Moderate Balance';
+        badge.className = 'px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30';
+      }
+    }
+
+    // ========================================================
+    // EVENT STYLIST
+    // ========================================================
+    const eventGuides = {
+      sangeet: {
+        title: 'Sangeet & Cocktail Night',
+        dress: 'Royal Sapphire Blue Evening Gown OR Emerald Green Anarkali',
+        jewelry: 'Traditional Kundan & Pearl Jhumkas',
+        shoes: 'Tan Leather Block Heels (2 inch) - Comfort for dancing',
+        makeup: 'Warm Terracotta Matte Lip + Defined Winged Black Liquid Liner + Golden Highlight',
+        lightingNote: 'Dim venue and artificial disco lighting require reflective gold jewelry and a defined winged eye to keep facial features sharp.'
+      },
+      wedding: {
+        title: 'Traditional Wedding Ceremony',
+        dress: 'Emerald Green A-Line Anarkali Kurti',
+        jewelry: 'Traditional Kundan Jhumkas + Layered Gold Chain',
+        shoes: 'Gold Embroidered Juttis (Easy on/off for rituals)',
+        makeup: 'Classic Ruby Red Lip + Smudged Brown Kohl Kajal + Peachy Blush Flush',
+        lightingNote: 'Morning sunlight and festive colors look most regal with traditional gold juttis and warm red lipstick.'
+      },
+      puja: {
+        title: 'Festive Gathering / Family Puja',
+        dress: 'Mustard Saffron Tiered Maxi Dress',
+        jewelry: 'Minimalist Freshwater Pearl Studs',
+        shoes: 'Pointed-Toe Nude Flat Mules',
+        makeup: 'Peachy Nude Satin Lip + Tightline Brown Liner',
+        lightingNote: 'Subtle, respectful warmth with high breathable comfort.'
+      },
+      presentation: {
+        title: 'Executive Client Presentation / Tech Park Meeting',
+        dress: 'Terracotta Wrap Midi Dress with Camel Structured Blazer',
+        jewelry: 'Polished Yellow Gold Chunky Hoops',
+        shoes: 'Pointed-Toe Nude Flat Mules or Block Heels',
+        makeup: 'Warm Terracotta Velvet Lip + Precision Black Liquid Eyeliner',
+        lightingNote: 'Crisp fluorescent office lighting thrives on clean collarbone structure and matte lipstick.'
+      }
+    };
+
+    function filterEvent(evKey) {
+      currentEvent = evKey;
+      document.querySelectorAll('.ev-btn').forEach(b => {
+        b.className = 'ev-btn px-3 py-1.5 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 font-medium whitespace-nowrap';
+      });
+      const active = document.getElementById('ev-' + evKey);
+      if (active) active.className = 'ev-btn px-3 py-1.5 rounded-lg bg-brand-700 text-white font-semibold whitespace-nowrap';
+      renderEventDisplay();
+    }
+
+    function renderEventDisplay() {
+      const container = document.getElementById('event-display-container');
+      const data = eventGuides[currentEvent] || eventGuides.sangeet;
+
+      container.innerHTML = `
+        <div class="p-5 rounded-2xl bg-stone-50 border border-stone-200 space-y-4">
+          <div class="flex items-center justify-between border-b border-stone-200 pb-3">
+            <h3 class="font-serif text-xl font-bold text-stone-900">${data.title}</h3>
+            <span class="text-xs px-2.5 py-0.5 rounded-full bg-brand-100 text-brand-800 font-semibold">Curated From Closet</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <div class="p-3 bg-white rounded-xl border border-stone-200">
+              <span class="font-bold text-stone-400 uppercase text-[10px] block mb-0.5">Hero Outfit:</span>
+              <p class="font-bold text-stone-900">${data.dress}</p>
+            </div>
+            <div class="p-3 bg-white rounded-xl border border-stone-200">
+              <span class="font-bold text-stone-400 uppercase text-[10px] block mb-0.5">Jewelry Hero:</span>
+              <p class="font-bold text-stone-900">${data.jewelry}</p>
+            </div>
+            <div class="p-3 bg-white rounded-xl border border-stone-200">
+              <span class="font-bold text-stone-400 uppercase text-[10px] block mb-0.5">Footwear:</span>
+              <p class="font-bold text-stone-900">${data.shoes}</p>
+            </div>
+            <div class="p-3 bg-white rounded-xl border border-stone-200">
+              <span class="font-bold text-stone-400 uppercase text-[10px] block mb-0.5">Makeup Formula:</span>
+              <p class="font-bold text-brand-900">${data.makeup}</p>
+            </div>
+          </div>
+
+          <div class="bg-amber-50 border border-amber-200/80 rounded-xl p-3 text-xs text-amber-950">
+            <strong>Lighting & Atmosphere Advice:</strong> ${data.lightingNote}
+          </div>
+        </div>
+      `;
+    }
+
+    // ========================================================
+    // TRAVEL PACKING CAPSULE
+    // ========================================================
+    function setTravelDays(days) {
+      travelDays = days;
+      document.getElementById('tday-3').className = days === 3 ? 'px-3 py-1.5 rounded-lg bg-brand-700 text-white font-semibold' : 'px-3 py-1.5 rounded-lg text-stone-600 hover:text-stone-900';
+      document.getElementById('tday-5').className = days === 5 ? 'px-3 py-1.5 rounded-lg bg-brand-700 text-white font-semibold' : 'px-3 py-1.5 rounded-lg text-stone-600 hover:text-stone-900';
+      renderTravelCapsule();
+    }
+
+    function renderTravelCapsule() {
+      const container = document.getElementById('travel-capsule-display');
+
+      if (travelDays === 3) {
+        container.innerHTML = `
+          <div class="p-4 rounded-xl bg-stone-50 border border-stone-200 space-y-3">
+            <h4 class="font-bold text-stone-900 text-sm">3-Day Minimalist Capsule (3 Dresses &bull; 2 Shoes &bull; 1 Layer &bull; 6 Looks)</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+              <div class="p-3 bg-white rounded-xl border border-stone-200">
+                <span class="font-bold text-brand-700 block mb-1">Day 1: Travel & Check-in</span>
+                <p class="font-medium text-stone-800">Navy Floral Fit-and-Flare Dress + White Sneakers + Denim Jacket</p>
+              </div>
+              <div class="p-3 bg-white rounded-xl border border-stone-200">
+                <span class="font-bold text-brand-700 block mb-1">Day 2: Exploration & Dinner</span>
+                <p class="font-medium text-stone-800">Terracotta Wrap Midi Dress + Pointed Flat Mules (Day) &rarr; Tan Block Heels (Dinner)</p>
+              </div>
+              <div class="p-3 bg-white rounded-xl border border-stone-200">
+                <span class="font-bold text-brand-700 block mb-1">Day 3: Sightseeing & Return</span>
+                <p class="font-medium text-stone-800">Mustard Saffron Maxi + White Sneakers + Pearl Studs</p>
+              </div>
+            </div>
+          </div>
+        `;
+      } else {
+        container.innerHTML = `
+          <div class="p-4 rounded-xl bg-stone-50 border border-stone-200 space-y-3">
+            <h4 class="font-bold text-stone-900 text-sm">5-Day Vacation Capsule (4 Dresses &bull; 2 Shoes &bull; 2 Layers &bull; 10 Looks)</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+              <div class="p-3 bg-white rounded-xl border border-stone-200">
+                <span class="font-bold text-brand-700 block mb-1">Day 1: Transit & Cafe</span>
+                <p class="font-medium text-stone-800">Navy Floral Dress + White Sneakers</p>
+              </div>
+              <div class="p-3 bg-white rounded-xl border border-stone-200">
+                <span class="font-bold text-brand-700 block mb-1">Day 2: City Walks</span>
+                <p class="font-medium text-stone-800">Mustard Maxi + White Sneakers + Denim Jacket</p>
+              </div>
+              <div class="p-3 bg-white rounded-xl border border-stone-200">
+                <span class="font-bold text-brand-700 block mb-1">Day 3: Fine Dining & Rooftop</span>
+                <p class="font-medium text-stone-800">Sapphire Navy Gown + Tan Block Heels + Bold Red Lip</p>
+              </div>
+              <div class="p-3 bg-white rounded-xl border border-stone-200">
+                <span class="font-bold text-brand-700 block mb-1">Day 4: Cultural / Monument Visit</span>
+                <p class="font-medium text-stone-800">Emerald Anarkali + Gold Juttis + Kundan Jhumkas</p>
+              </div>
+              <div class="p-3 bg-white rounded-xl border border-stone-200">
+                <span class="font-bold text-brand-700 block mb-1">Day 5: Casual Wrap & Fly Out</span>
+                <p class="font-medium text-stone-800">Terracotta Wrap Dress + Pointed Mules</p>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    // ========================================================
+    // MODALS: PROFILE, ADD ITEM & SHARE
+    // ========================================================
+    
+    function showInstallInstructions() {
+      document.getElementById('modal-install').classList.remove('hidden');
+    }
+    function closeInstallModal() {
+      document.getElementById('modal-install').classList.add('hidden');
+    }
+
+    function openProfileModal() { document.getElementById('modal-profile').classList.remove('hidden'); }
+    function closeProfileModal() { document.getElementById('modal-profile').classList.add('hidden'); }
+
+    function handlePhotoUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('avatar-preview').innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover">`;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function saveProfile() {
+      profile.skinTone = document.getElementById('profile-skin').value;
+      profile.shape = document.getElementById('profile-shape').value;
+      profile.height = document.getElementById('profile-height').value;
+      document.getElementById('header-profile-subtitle').textContent = `Warm Wheatish • ${profile.shape === 'pear' ? 'Pear Frame' : 'Hourglass Frame'} • ${wardrobe.length} Items`;
+      closeProfileModal();
+      showToast('Profile updated! Styling formulas re-calibrated.', '✓');
+    }
+
+    function openAddItemModal() { document.getElementById('modal-add-item').classList.remove('hidden'); }
+    function closeAddItemModal() { document.getElementById('modal-add-item').classList.add('hidden'); }
+
+    function saveNewItem() {
+      const cat = document.getElementById('new-item-cat').value;
+      const name = document.getElementById('new-item-name').value || 'New Wardrobe Piece';
+      const color = document.getElementById('new-item-color').value || 'Neutral';
+      const fabric = document.getElementById('new-item-fabric').value || 'Cotton';
+
+      const newItem = {
+        id: 'user_' + Date.now(),
+        cat: cat,
+        name: name,
+        color: color,
+        fabric: fabric,
+        cut: 'Classic',
+        flattery: 'high',
+        score: 94,
+        pros: 'Matches your personal color harmony.',
+        cons: 'None.',
+        rescue: 'Pair with your warm gold jewelry and neutral block heels.'
+      };
+
+      wardrobe.unshift(newItem);
+      closeAddItemModal();
+      renderCloset('all');
+      showToast('Item added to closet & synced to cloud!', '✨');
+    }
+
+    function openShareModal(title, dress, shoes, bag, jewelry, makeup) {
+      const content = document.getElementById('share-card-content');
+      content.innerHTML = `
+        <div class="space-y-3">
+          <div class="flex items-center justify-between border-b border-stone-200 pb-2">
+            <div>
+              <span class="text-[10px] font-bold text-brand-700 uppercase tracking-widest block">AuraWardrobe Curated Look</span>
+              <h4 class="font-serif text-lg font-bold text-stone-900">${title}</h4>
+            </div>
+            <span class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded">97% Match</span>
+          </div>
+          <div class="space-y-1.5 text-xs text-stone-700">
+            <p><strong>👗 Dress:</strong> ${dress}</p>
+            <p><strong>👠 Shoes:</strong> ${shoes}</p>
+            <p><strong>👜 Handbag:</strong> ${bag}</p>
+            <p><strong>💍 Jewelry:</strong> ${jewelry}</p>
+            <p><strong>💄 Makeup:</strong> ${makeup}</p>
+          </div>
+          <p class="text-[10px] text-stone-400 italic pt-1 border-t border-stone-100">Styling advice tailored to Warm Wheatish &bull; Pear Frame</p>
+        </div>
+      `;
+      document.getElementById('modal-share').classList.remove('hidden');
+    }
+
+    function closeShareModal() { document.getElementById('modal-share').classList.add('hidden'); }
+
+    function copyShareText() {
+      const text = `AuraWardrobe Outfit Look:
+- Check out this outfit formula from my closet! Tailored for my silhouette and undertone.`;
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text);
+      }
+      document.getElementById('btn-copy-share').textContent = '✓ Copied to Clipboard!';
+      setTimeout(() => {
+        document.getElementById('btn-copy-share').textContent = '📋 Copy Outfit Details';
+      }, 2000);
+    }
+
+    function exportWardrobeBackup() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(wardrobe, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", "AuraWardrobe_Cloud_Backup.json");
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    function printStylingDossier() {
+      window.print();
+    }
+
+    // Run on startup
+    
+    function showToast(msg, icon = '✓') {
+      const toast = document.getElementById('app-toast');
+      const toastMsg = document.getElementById('app-toast-msg');
+      const toastIcon = document.getElementById('app-toast-icon');
+      if (toast && toastMsg) {
+        toastMsg.textContent = msg;
+        toastIcon.textContent = icon;
+        toast.classList.remove('opacity-0', 'pointer-events-none');
+        toast.classList.add('opacity-100');
+        setTimeout(() => {
+          toast.classList.remove('opacity-100');
+          toast.classList.add('opacity-0', 'pointer-events-none');
+        }, 2800);
+      }
+    }
+
+    window.onload = function() {
+      renderTodayOutfit();
+    };
+  </script>
+
+  <!-- In-Page Floating Toast Notification -->
+  <div id="app-toast" class="fixed bottom-24 md:bottom-8 left-1/2 transform -translate-x-1/2 z-50 bg-stone-900 text-white text-xs px-4 py-2.5 rounded-xl shadow-xl border border-stone-700 transition-all duration-300 opacity-0 pointer-events-none flex items-center gap-2">
+    <span id="app-toast-icon">✓</span>
+    <span id="app-toast-msg">Notification</span>
+  </div>
+
+  <!-- Standalone App Installation Guide Modal -->
+  <div id="modal-install" class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-stone-200 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">📲</span>
+          <h3 class="font-serif text-lg font-bold text-stone-900">Install as Standalone App</h3>
+        </div>
+        <button onclick="closeInstallModal()" class="text-stone-400 hover:text-stone-700 text-xl font-bold">&times;</button>
+      </div>
+
+      <div class="space-y-3 text-xs text-stone-700 leading-relaxed">
+        <!-- iOS Instructions -->
+        <div class="p-3.5 rounded-xl bg-stone-50 border border-stone-200 space-y-1.5">
+          <div class="flex items-center gap-2 font-bold text-stone-900">
+            <span>🍏 iPhone / iPad (iOS Users):</span>
+          </div>
+          <ol class="list-decimal list-inside space-y-1 text-stone-600 pl-1">
+            <li>Open this link in <strong>Safari</strong> on your iPhone.</li>
+            <li>Tap the <strong>Share</strong> icon (box with upward arrow) at the bottom.</li>
+            <li>Scroll down and tap <strong>"Add to Home Screen"</strong>.</li>
+            <li>Tap <strong>Add</strong>. It will now launch full-screen as a standalone app on your home screen!</li>
+          </ol>
+        </div>
+
+        <!-- Android Instructions -->
+        <div class="p-3.5 rounded-xl bg-emerald-50/60 border border-emerald-200 space-y-1.5">
+          <div class="flex items-center gap-2 font-bold text-emerald-950">
+            <span>🤖 Android Users (Chrome / Samsung Internet):</span>
+          </div>
+          <ol class="list-decimal list-inside space-y-1 text-stone-600 pl-1">
+            <li>Open this link in <strong>Google Chrome</strong> or your mobile browser.</li>
+            <li>Tap the <strong>3 vertical dots</strong> (Menu) at top right.</li>
+            <li>Select <strong>"Install App"</strong> or <strong>"Add to Home screen"</strong>.</li>
+            <li>It installs directly into your Android app drawer with its own app icon and runs full-screen!</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="pt-2 border-t border-stone-200 flex justify-end">
+        <button onclick="closeInstallModal()" class="px-5 py-2 rounded-xl bg-brand-700 hover:bg-brand-800 text-white text-xs font-semibold">
+          Got It
+        </button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
