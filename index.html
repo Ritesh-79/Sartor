@@ -3,14 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>AuraWardrobe - AI Personal Stylist & Digital Closet</title>
+  <title>Sartor - AI Personal Stylist & Digital Closet</title>
+  
   <!-- Standalone Mobile App (PWA) Meta Tags for iOS & Android -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="AuraWardrobe">
+  <meta name="apple-mobile-web-app-title" content="Sartor">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="theme-color" content="#754D3B">
-  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23754D3B'/%3E%3Ctext x='50' y='65' font-family='serif' font-size='50' font-weight='bold' fill='white' text-anchor='middle'%3EA%3C/text%3E%3C/svg%3E">
+  
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
+  <!-- Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js');
+      });
+    }
+  </script>
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
@@ -49,7 +61,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
   <style>
-    /* Mobile-first polish & smooth scrolling */
     html { -webkit-tap-highlight-color: transparent; scroll-behavior: smooth; }
     ::-webkit-scrollbar { width: 4px; height: 4px; }
     ::-webkit-scrollbar-track { background: #FAF7F5; }
@@ -60,20 +71,19 @@
 </head>
 <body class="bg-[#FAF7F5] text-stone-800 font-sans antialiased min-h-screen flex flex-col pb-20 sm:pb-8">
 
-  <!-- ======================================================== -->
-  <!-- TOP NAVIGATION HEADER                                   -->
-  <!-- ======================================================== -->
+  <!-- TOP NAVIGATION HEADER -->
   <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-stone-200">
     <div class="max-w-7xl mx-auto px-4 sm:px-6">
       <div class="flex items-center justify-between h-16">
         <!-- Logo & Profile Pill -->
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-brand-800 via-brand-600 to-amber-200 flex items-center justify-center text-white shadow-sm font-serif font-bold text-xl">
-            A
+          <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-brand-800 via-brand-600 to-amber-200 flex items-center justify-center text-white shadow-sm font-serif font-bold text-xl overflow-hidden">
+            <img src="icon-192.png" alt="Sartor" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <span style="display:none;">S</span>
           </div>
           <div>
             <div class="flex items-center gap-2">
-              <span class="font-serif font-bold text-lg sm:text-xl tracking-tight text-stone-900">AuraWardrobe</span>
+              <span class="font-serif font-bold text-lg sm:text-xl tracking-tight text-stone-900">Sartor</span>
               <span class="hidden sm:inline-block text-[11px] font-semibold px-2 py-0.5 rounded-full bg-brand-100 text-brand-800 border border-brand-200">Mobile Edition</span>
             </div>
             <p id="header-profile-subtitle" class="text-[11px] text-stone-500 font-medium">Warm Wheatish • Pear Frame • 28 Items</p>
@@ -107,14 +117,10 @@
     </div>
   </header>
 
-  <!-- ======================================================== -->
-  <!-- MAIN APP CONTAINER                                       -->
-  <!-- ======================================================== -->
+  <!-- MAIN APP CONTAINER -->
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-6">
 
-    <!-- ======================================================== -->
-    <!-- TAB 1: TODAY'S MORNING GENERATOR                         -->
-    <!-- ======================================================== -->
+    <!-- TAB 1: TODAY'S MORNING GENERATOR -->
     <div id="tab-today" class="tab-view space-y-6">
 
       <!-- Standalone App Quick Install Banner -->
@@ -124,7 +130,7 @@
             📱
           </div>
           <div>
-            <h4 class="font-bold text-xs sm:text-sm">Use as Standalone Mobile App</h4>
+            <h4 class="font-bold text-xs sm:text-sm">Use Sartor as Standalone App</h4>
             <p class="text-[11px] text-stone-300">Run full-screen on iPhone & Android without browser bars.</p>
           </div>
         </div>
@@ -137,7 +143,7 @@
       <div class="bg-gradient-to-r from-stone-900 via-brand-900 to-stone-900 rounded-2xl p-5 sm:p-6 text-white shadow-md border border-stone-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div class="space-y-1">
           <div class="flex items-center gap-2">
-            <span class="text-xs px-2.5 py-0.5 rounded-full bg-white/10 text-amber-200 font-semibold tracking-wide uppercase">Doddathoguru / Bengaluru Local Weather</span>
+            <span class="text-xs px-2.5 py-0.5 rounded-full bg-white/10 text-amber-200 font-semibold tracking-wide uppercase">Bengaluru Local Weather</span>
             <span class="text-xs text-stone-400">☀️ 26°C • Pleasant / Breezy</span>
           </div>
           <h2 class="font-serif text-2xl sm:text-3xl font-bold tracking-tight">What to Wear Today</h2>
@@ -170,9 +176,7 @@
       </div>
     </div>
 
-    <!-- ======================================================== -->
-    <!-- TAB 2: DIGITAL CLOSET SHELVES                            -->
-    <!-- ======================================================== -->
+    <!-- TAB 2: DIGITAL CLOSET SHELVES -->
     <div id="tab-closet" class="tab-view hidden space-y-6">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
@@ -202,9 +206,7 @@
       </div>
     </div>
 
-    <!-- ======================================================== -->
-    <!-- TAB 3: FLATTERY VERDICTS & RESCUE STYLING                -->
-    <!-- ======================================================== -->
+    <!-- TAB 3: FLATTERY VERDICTS & RESCUE STYLING -->
     <div id="tab-flattery" class="tab-view hidden space-y-6">
       <div class="bg-white rounded-2xl p-5 sm:p-6 border border-stone-200 shadow-sm space-y-2">
         <span class="text-xs font-bold uppercase tracking-wider text-brand-700">Honest Wardrobe Critique</span>
@@ -214,22 +216,18 @@
         </p>
       </div>
 
-      <!-- Dress Flattery Cards -->
       <div id="flattery-cards-container" class="space-y-4">
         <!-- Rendered by JS -->
       </div>
     </div>
 
-    <!-- ======================================================== -->
-    <!-- TAB 4: HEAD-TO-TOE OUTFITS                               -->
-    <!-- ======================================================== -->
+    <!-- TAB 4: HEAD-TO-TOE OUTFITS -->
     <div id="tab-outfits" class="tab-view hidden space-y-6">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h2 class="font-serif text-2xl font-bold text-stone-900">Curated Head-to-Toe Outfits</h2>
           <p class="text-xs sm:text-sm text-stone-500">Engineered strictly from what you already own with simple vs glam beauty toggles.</p>
         </div>
-        <!-- Simple vs Glam toggle -->
         <div class="flex items-center gap-2 self-start sm:self-auto bg-white p-1 rounded-xl border border-stone-200 text-xs font-medium">
           <span class="text-stone-400 pl-2">Makeup Mode:</span>
           <button onclick="toggleMakeupMode('simple')" id="mmode-simple" class="px-2.5 py-1 rounded-lg bg-stone-100 text-stone-700">🌱 Simple / 5-Min</button>
@@ -237,15 +235,12 @@
         </div>
       </div>
 
-      <!-- Outfits Grid -->
       <div id="outfits-cards-grid" class="grid grid-cols-1 md:grid-cols-2 gap-5">
         <!-- Rendered by JS -->
       </div>
     </div>
 
-    <!-- ======================================================== -->
-    <!-- TAB 5: CLOSET MIXER STUDIO                               -->
-    <!-- ======================================================== -->
+    <!-- TAB 5: CLOSET MIXER STUDIO -->
     <div id="tab-mixer" class="tab-view hidden space-y-6">
       <div class="bg-white rounded-2xl p-5 sm:p-6 border border-stone-200 shadow-sm space-y-6">
         <div>
@@ -255,55 +250,36 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <!-- Selectors -->
           <div class="lg:col-span-2 space-y-3.5">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-              <!-- Dress Selector -->
               <div class="p-3.5 rounded-xl bg-stone-50 border border-stone-200 space-y-1">
                 <label class="text-[11px] font-bold text-stone-700 uppercase tracking-wide block">1. Select Dress / Outfit</label>
-                <select id="mix-dress" onchange="calcMixerScore()" class="w-full text-xs sm:text-sm bg-white border border-stone-300 rounded-lg p-2 focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                  <!-- Injected by JS -->
-                </select>
+                <select id="mix-dress" onchange="calcMixerScore()" class="w-full text-xs sm:text-sm bg-white border border-stone-300 rounded-lg p-2 focus:ring-2 focus:ring-brand-500 focus:outline-none"></select>
               </div>
 
-              <!-- Layering Selector -->
               <div class="p-3.5 rounded-xl bg-stone-50 border border-stone-200 space-y-1">
                 <label class="text-[11px] font-bold text-stone-700 uppercase tracking-wide block">2. Select Layer / Jacket</label>
-                <select id="mix-layer" onchange="calcMixerScore()" class="w-full text-xs sm:text-sm bg-white border border-stone-300 rounded-lg p-2 focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                  <!-- Injected by JS -->
-                </select>
+                <select id="mix-layer" onchange="calcMixerScore()" class="w-full text-xs sm:text-sm bg-white border border-stone-300 rounded-lg p-2 focus:ring-2 focus:ring-brand-500 focus:outline-none"></select>
               </div>
 
-              <!-- Shoe Selector -->
               <div class="p-3.5 rounded-xl bg-stone-50 border border-stone-200 space-y-1">
                 <label class="text-[11px] font-bold text-stone-700 uppercase tracking-wide block">3. Select Footwear</label>
-                <select id="mix-shoes" onchange="calcMixerScore()" class="w-full text-xs sm:text-sm bg-white border border-stone-300 rounded-lg p-2 focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                  <!-- Injected by JS -->
-                </select>
+                <select id="mix-shoes" onchange="calcMixerScore()" class="w-full text-xs sm:text-sm bg-white border border-stone-300 rounded-lg p-2 focus:ring-2 focus:ring-brand-500 focus:outline-none"></select>
               </div>
 
-              <!-- Jewelry Selector -->
               <div class="p-3.5 rounded-xl bg-stone-50 border border-stone-200 space-y-1">
                 <label class="text-[11px] font-bold text-stone-700 uppercase tracking-wide block">4. Select Jewelry</label>
-                <select id="mix-jewelry" onchange="calcMixerScore()" class="w-full text-xs sm:text-sm bg-white border border-stone-300 rounded-lg p-2 focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                  <!-- Injected by JS -->
-                </select>
+                <select id="mix-jewelry" onchange="calcMixerScore()" class="w-full text-xs sm:text-sm bg-white border border-stone-300 rounded-lg p-2 focus:ring-2 focus:ring-brand-500 focus:outline-none"></select>
               </div>
 
-              <!-- Handbag Selector -->
               <div class="p-3.5 rounded-xl bg-stone-50 border border-stone-200 space-y-1">
                 <label class="text-[11px] font-bold text-stone-700 uppercase tracking-wide block">5. Select Handbag</label>
-                <select id="mix-bag" onchange="calcMixerScore()" class="w-full text-xs sm:text-sm bg-white border border-stone-300 rounded-lg p-2 focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                  <!-- Injected by JS -->
-                </select>
+                <select id="mix-bag" onchange="calcMixerScore()" class="w-full text-xs sm:text-sm bg-white border border-stone-300 rounded-lg p-2 focus:ring-2 focus:ring-brand-500 focus:outline-none"></select>
               </div>
 
-              <!-- Lipstick Selector -->
               <div class="p-3.5 rounded-xl bg-stone-50 border border-stone-200 space-y-1">
                 <label class="text-[11px] font-bold text-stone-700 uppercase tracking-wide block">6. Select Lipstick</label>
-                <select id="mix-lip" onchange="calcMixerScore()" class="w-full text-xs sm:text-sm bg-white border border-stone-300 rounded-lg p-2 focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                  <!-- Injected by JS -->
-                </select>
+                <select id="mix-lip" onchange="calcMixerScore()" class="w-full text-xs sm:text-sm bg-white border border-stone-300 rounded-lg p-2 focus:ring-2 focus:ring-brand-500 focus:outline-none"></select>
               </div>
             </div>
           </div>
@@ -322,7 +298,6 @@
                 <p id="mix-score-label" class="text-xs text-stone-300 mt-0.5">High Silhouette & Color Synergy</p>
               </div>
 
-              <!-- Metrics -->
               <div class="space-y-2 pt-2 border-t border-white/10 text-xs">
                 <div>
                   <div class="flex justify-between text-[11px] mb-1">
@@ -367,9 +342,7 @@
       </div>
     </div>
 
-    <!-- ======================================================== -->
-    <!-- TAB 6: EVENT STYLIST                                     -->
-    <!-- ======================================================== -->
+    <!-- TAB 6: EVENT STYLIST -->
     <div id="tab-events" class="tab-view hidden space-y-6">
       <div class="bg-white rounded-2xl p-5 sm:p-6 border border-stone-200 shadow-sm space-y-4">
         <div>
@@ -378,7 +351,6 @@
           <p class="text-xs sm:text-sm text-stone-500 mt-1">Calibrated for Sangeet/Cocktails, Weddings, Traditional Pujas, and High-Stakes Office Events.</p>
         </div>
 
-        <!-- Event Type Pills -->
         <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
           <button onclick="filterEvent('sangeet')" id="ev-sangeet" class="ev-btn px-3 py-1.5 rounded-lg bg-brand-700 text-white font-semibold whitespace-nowrap">✨ Sangeet / Cocktail Party</button>
           <button onclick="filterEvent('wedding')" id="ev-wedding" class="ev-btn px-3 py-1.5 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 font-medium whitespace-nowrap">💍 Wedding Ceremony</button>
@@ -386,16 +358,11 @@
           <button onclick="filterEvent('presentation')" id="ev-presentation" class="ev-btn px-3 py-1.5 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 font-medium whitespace-nowrap">💼 Executive Presentation</button>
         </div>
 
-        <!-- Event Details Box -->
-        <div id="event-display-container" class="space-y-4 pt-2">
-          <!-- Rendered by JS -->
-        </div>
+        <div id="event-display-container" class="space-y-4 pt-2"></div>
       </div>
     </div>
 
-    <!-- ======================================================== -->
-    <!-- TAB 7: TRAVEL PACKING CAPSULE                            -->
-    <!-- ======================================================== -->
+    <!-- TAB 7: TRAVEL PACKING CAPSULE -->
     <div id="tab-travel" class="tab-view hidden space-y-6">
       <div class="bg-white rounded-2xl p-5 sm:p-6 border border-stone-200 shadow-sm space-y-4">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -410,19 +377,13 @@
           </div>
         </div>
 
-        <div id="travel-capsule-display" class="space-y-4 pt-2">
-          <!-- Injected by JS -->
-        </div>
+        <div id="travel-capsule-display" class="space-y-4 pt-2"></div>
       </div>
     </div>
 
-    <!-- ======================================================== -->
-    <!-- TAB 8: INSIGHTS & SHOPPING MULTIPLIERS                   -->
-    <!-- ======================================================== -->
+    <!-- TAB 8: INSIGHTS & SHOPPING MULTIPLIERS -->
     <div id="tab-insights" class="tab-view hidden space-y-6">
-      <!-- Unworn Pieces Alert & Closet Stats -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <!-- Unworn Pieces Alert -->
         <div class="bg-amber-50/70 border border-amber-200 rounded-2xl p-5 space-y-3">
           <div class="flex items-center gap-2 text-amber-900 font-bold text-sm">
             <span>💡 Rediscover Unworn Pieces</span>
@@ -437,7 +398,6 @@
           </div>
         </div>
 
-        <!-- Cloud Sync & Data Management -->
         <div class="bg-white border border-stone-200 rounded-2xl p-5 space-y-3 shadow-sm">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2 text-stone-900 font-bold text-sm">
@@ -459,7 +419,6 @@
         </div>
       </div>
 
-      <!-- Optional Shopping Multiplier Tab -->
       <div class="bg-white rounded-2xl p-5 sm:p-6 border border-stone-200 shadow-sm space-y-4">
         <div>
           <span class="text-xs font-bold uppercase tracking-wider text-brand-700">Optional Wardrobe Multiplier</span>
@@ -470,53 +429,31 @@
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-1">
-          <!-- Item 1: Tan Pointed-Toe Flats -->
           <div class="p-4 rounded-xl bg-stone-50 border border-stone-200 space-y-2.5">
             <div class="flex items-center justify-between">
               <span class="text-xs font-bold text-brand-800 uppercase tracking-wide">Footwear Multiplier</span>
               <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-semibold">+8 Outfits</span>
             </div>
             <h4 class="font-serif font-bold text-stone-900 text-base">Tan / Nude Pointed Flat Mules</h4>
-            <p class="text-xs text-stone-600 leading-relaxed">
-              Elongates your legs with midi dresses and kurtis without adding uncomfortable heel height.
-            </p>
-            <div class="pt-1 flex items-center gap-2 text-xs">
-              <a href="https://www.myntra.com/pointed-flats" target="_blank" class="text-brand-700 hover:underline font-semibold">Myntra</a> •
-              <a href="https://www.ajio.com" target="_blank" class="text-brand-700 hover:underline font-semibold">Ajio</a> •
-              <a href="https://www.zara.com" target="_blank" class="text-brand-700 hover:underline font-semibold">Zara</a>
-            </div>
+            <p class="text-xs text-stone-600 leading-relaxed">Elongates your legs with midi dresses and kurtis without adding uncomfortable heel height.</p>
           </div>
 
-          <!-- Item 2: Gold Minimalist Chain Belt -->
           <div class="p-4 rounded-xl bg-stone-50 border border-stone-200 space-y-2.5">
             <div class="flex items-center justify-between">
               <span class="text-xs font-bold text-brand-800 uppercase tracking-wide">Waist Multiplier</span>
               <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-semibold">+6 Outfits</span>
             </div>
             <h4 class="font-serif font-bold text-stone-900 text-base">Slim Gold Metal Chain Belt</h4>
-            <p class="text-xs text-stone-600 leading-relaxed">
-              Cinches shift dresses and anarkalis right at your narrowest waist, creating an instant hourglass visual line.
-            </p>
-            <div class="pt-1 flex items-center gap-2 text-xs">
-              <a href="https://www.nykaafashion.com" target="_blank" class="text-brand-700 hover:underline font-semibold">Nykaa Fashion</a> •
-              <a href="https://www.myntra.com/belts" target="_blank" class="text-brand-700 hover:underline font-semibold">Myntra</a>
-            </div>
+            <p class="text-xs text-stone-600 leading-relaxed">Cinches shift dresses and anarkalis right at your narrowest waist, creating an instant hourglass visual line.</p>
           </div>
 
-          <!-- Item 3: Terracotta Matte Bullet -->
           <div class="p-4 rounded-xl bg-stone-50 border border-stone-200 space-y-2.5">
             <div class="flex items-center justify-between">
               <span class="text-xs font-bold text-brand-800 uppercase tracking-wide">Makeup Multiplier</span>
               <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-semibold">+10 Outfits</span>
             </div>
             <h4 class="font-serif font-bold text-stone-900 text-base">Spiced Cinnamon Terracotta Lip</h4>
-            <p class="text-xs text-stone-600 leading-relaxed">
-              The holy grail shade for warm wheatish complexions—warms up neutral black and navy dresses effortlessly.
-            </p>
-            <div class="pt-1 flex items-center gap-2 text-xs">
-              <a href="https://www.nykaa.com" target="_blank" class="text-brand-700 hover:underline font-semibold">Nykaa</a> •
-              <a href="https://www.maccosmetics.in" target="_blank" class="text-brand-700 hover:underline font-semibold">MAC India</a>
-            </div>
+            <p class="text-xs text-stone-600 leading-relaxed">The holy grail shade for warm wheatish complexions—warms up neutral black and navy dresses effortlessly.</p>
           </div>
         </div>
       </div>
@@ -524,9 +461,7 @@
 
   </main>
 
-  <!-- ======================================================== -->
-  <!-- MOBILE BOTTOM QUICK DOCK (Sticky on Smartphones)          -->
-  <!-- ======================================================== -->
+  <!-- MOBILE BOTTOM DOCK -->
   <div class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-stone-200 px-3 py-2 flex items-center justify-around text-[10px] font-medium text-stone-600 shadow-lg">
     <button onclick="switchTab('today')" id="mob-today" class="mob-btn flex flex-col items-center gap-1 text-brand-700 font-bold">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
@@ -550,9 +485,7 @@
     </button>
   </div>
 
-  <!-- ======================================================== -->
-  <!-- MODAL 1: PROFILE & PHOTO CUSTOMIZATION                   -->
-  <!-- ======================================================== -->
+  <!-- PROFILE MODAL -->
   <div id="modal-profile" class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-lg w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto shadow-2xl">
       <div class="flex items-center justify-between border-b border-stone-200 pb-3">
@@ -560,10 +493,9 @@
         <button onclick="closeProfileModal()" class="text-stone-400 hover:text-stone-700 text-xl font-bold">&times;</button>
       </div>
 
-      <!-- Photo Upload & Detection -->
       <div class="p-4 rounded-xl bg-stone-50 border border-stone-200 space-y-3 text-center">
         <div class="w-20 h-20 mx-auto rounded-full bg-brand-100 border-2 border-brand-300 flex items-center justify-center text-3xl shadow-sm overflow-hidden" id="avatar-preview">
-          👩🏽
+          <img src="icon-192.png" alt="Profile" class="w-full h-full object-cover" onerror="this.src=''; this.alt='👩🏽';">
         </div>
         <div>
           <label class="px-3 py-1.5 rounded-lg bg-stone-900 hover:bg-brand-900 text-white text-xs font-semibold cursor-pointer inline-flex items-center gap-1.5">
@@ -571,11 +503,10 @@
             <span>Upload Full-Length Photo</span>
             <input type="file" accept="image/*" class="hidden" onchange="handlePhotoUpload(event)">
           </label>
-          <p class="text-[11px] text-stone-500 mt-1">Automated scan detected: Warm Wheatish • Pear Frame</p>
+          <p class="text-[11px] text-stone-500 mt-1">Calibrated to: Warm Wheatish • Pear Frame</p>
         </div>
       </div>
 
-      <!-- Manual Overrides -->
       <div class="space-y-3 text-xs">
         <div>
           <label class="font-bold text-stone-700 block mb-1">Skin Tone & Undertone Depth</label>
@@ -614,9 +545,7 @@
     </div>
   </div>
 
-  <!-- ======================================================== -->
-  <!-- MODAL 2: ADD NEW ITEM TO CLOSET                          -->
-  <!-- ======================================================== -->
+  <!-- ADD NEW ITEM MODAL -->
   <div id="modal-add-item" class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-lg w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto shadow-2xl">
       <div class="flex items-center justify-between border-b border-stone-200 pb-3">
@@ -653,7 +582,6 @@
           </div>
         </div>
 
-        <!-- Photo Upload Box -->
         <div class="p-4 rounded-xl border-2 border-dashed border-stone-300 text-center space-y-1 bg-stone-50">
           <svg class="w-6 h-6 mx-auto text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
           <span class="text-xs text-stone-600 font-medium block">Upload Photo or Auto-Cutout</span>
@@ -668,9 +596,7 @@
     </div>
   </div>
 
-  <!-- ======================================================== -->
-  <!-- MODAL 3: SHAREABLE LOOK CARD PREVIEW                     -->
-  <!-- ======================================================== -->
+  <!-- SHAREABLE LOOK MODAL -->
   <div id="modal-share" class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
       <div class="flex items-center justify-between border-b border-stone-200 pb-3">
@@ -678,10 +604,7 @@
         <button onclick="closeShareModal()" class="text-stone-400 hover:text-stone-700 text-xl font-bold">&times;</button>
       </div>
 
-      <!-- Card Canvas Snapshot -->
-      <div id="share-card-content" class="bg-gradient-to-br from-[#FAF7F5] to-amber-50/50 p-5 rounded-2xl border border-stone-200 space-y-3 text-stone-800">
-        <!-- Injected by JS -->
-      </div>
+      <div id="share-card-content" class="bg-gradient-to-br from-[#FAF7F5] to-amber-50/50 p-5 rounded-2xl border border-stone-200 space-y-3 text-stone-800"></div>
 
       <div class="flex items-center justify-between gap-2 pt-2 border-t border-stone-200">
         <button onclick="copyShareText()" id="btn-copy-share" class="flex-1 py-2 rounded-xl border border-stone-300 hover:bg-stone-50 text-xs font-semibold text-stone-700 transition-colors">
@@ -694,11 +617,59 @@
     </div>
   </div>
 
-  <!-- ======================================================== -->
-  <!-- SCRIPT: APPLICATION STATE & ENGINE                       -->
-  <!-- ======================================================== -->
+  <!-- INSTALLATION GUIDE MODAL -->
+  <div id="modal-install" class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-stone-200 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">📲</span>
+          <h3 class="font-serif text-lg font-bold text-stone-900">Install Sartor Standalone App</h3>
+        </div>
+        <button onclick="closeInstallModal()" class="text-stone-400 hover:text-stone-700 text-xl font-bold">&times;</button>
+      </div>
+
+      <div class="space-y-3 text-xs text-stone-700 leading-relaxed">
+        <div class="p-3.5 rounded-xl bg-stone-50 border border-stone-200 space-y-1.5">
+          <div class="flex items-center gap-2 font-bold text-stone-900">
+            <span>🍏 iPhone / iPad (iOS Safari):</span>
+          </div>
+          <ol class="list-decimal list-inside space-y-1 text-stone-600 pl-1">
+            <li>Open this link in <strong>Safari</strong>.</li>
+            <li>Tap the <strong>Share</strong> button (box with upward arrow) at the bottom.</li>
+            <li>Scroll down and tap <strong>"Add to Home Screen"</strong>.</li>
+            <li>Tap <strong>Add</strong> to launch in standalone full-screen mode.</li>
+          </ol>
+        </div>
+
+        <div class="p-3.5 rounded-xl bg-emerald-50/60 border border-emerald-200 space-y-1.5">
+          <div class="flex items-center gap-2 font-bold text-emerald-950">
+            <span>🤖 Android Users (Chrome):</span>
+          </div>
+          <ol class="list-decimal list-inside space-y-1 text-stone-600 pl-1">
+            <li>Open this link in <strong>Google Chrome</strong>.</li>
+            <li>Tap the <strong>3 vertical dots</strong> (Menu) at the top right.</li>
+            <li>Tap <strong>"Install app"</strong> or <strong>"Add to Home screen"</strong>.</li>
+            <li>Sartor installs directly into your app drawer with the lady icon.</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="pt-2 border-t border-stone-200 flex justify-end">
+        <button onclick="closeInstallModal()" class="px-5 py-2 rounded-xl bg-brand-700 hover:bg-brand-800 text-white text-xs font-semibold">
+          Got It
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- In-Page Floating Toast Notification -->
+  <div id="app-toast" class="fixed bottom-24 md:bottom-8 left-1/2 transform -translate-x-1/2 z-50 bg-stone-900 text-white text-xs px-4 py-2.5 rounded-xl shadow-xl border border-stone-700 transition-all duration-300 opacity-0 pointer-events-none flex items-center gap-2">
+    <span id="app-toast-icon">✓</span>
+    <span id="app-toast-msg">Notification</span>
+  </div>
+
+  <!-- APPLICATION JAVASCRIPT STATE ENGINE -->
   <script>
-    // --- USER PROFILE STATE ---
     let profile = {
       skinTone: 'wheatish_warm',
       undertone: 'Warm Golden Olive',
@@ -715,9 +686,7 @@
     let currentEvent = 'sangeet';
     let travelDays = 3;
 
-    // --- WARDROBE DATABASE (Initial Closet) ---
     let wardrobe = [
-      // DRESSES & OUTFITS
       { id: 'd1', cat: 'dresses', name: 'Terracotta Wrap Midi Dress', color: 'Terracotta', fabric: 'Crepe Viscose', cut: 'Wrap V-Neck', flattery: 'high', score: 96, pros: 'V-neck elongates upper torso; waist wrap highlights narrowest waistline.', cons: 'None; gold jewelry pairs seamlessly.', rescue: 'Wear with nude block heels and gold hoops.' },
       { id: 'd2', cat: 'dresses', name: 'Emerald Green A-Line Anarkali Kurti', color: 'Emerald Green', fabric: 'Chanderi Silk', cut: 'A-Line Flowing', flattery: 'high', score: 98, pros: 'Jewel green flatters warm olive undertone; flowing flare glides gracefully over hips.', cons: 'None.', rescue: 'Pair with statement jhumkas and pointed flat juttis.' },
       { id: 'd3', cat: 'dresses', name: 'Black Tailored Sheath Midi Dress', color: 'Classic Black', fabric: 'Ponte Knit', cut: 'Straight Sheath', flattery: 'partial', score: 82, pros: 'Sleek professional column line.', cons: 'Straight cut can cling to hips; solid black can look severe against warm skin without warm makeup.', rescue: 'Layer a structured open blazer to create vertical side panels, and apply warm cinnamon terracotta lipstick + gold hoops to warm up the face.' },
@@ -727,29 +696,24 @@
       { id: 'd7', cat: 'dresses', name: 'Beige Relaxed Linen Shirt Dress', color: 'Warm Beige', fabric: 'Linen', cut: 'Loose Shirt Shift', flattery: 'partial', score: 76, pros: 'Ultra-breathable and chic casual aesthetic.', cons: 'Loose boxy shift cut hides your waist completely and adds bulk around hips.', rescue: 'Unbutton top 2 buttons to form an elongating V-neck, roll up sleeves to elbows, and add a wide cognac leather belt right at your natural waist.' },
       { id: 'd8', cat: 'dresses', name: 'Royal Sapphire Blue Evening Gown', color: 'Sapphire Navy', fabric: 'Crepe Velvet', cut: 'Sweetheart Slit', flattery: 'high', score: 95, pros: 'Rich sapphire creates high visual contrast; sweetheart neckline opens collarbones.', cons: 'Requires metallic shoes to avoid darkness.', rescue: 'Pair with metallic block heels and bold red lip.' },
 
-      // FOOTWEAR
       { id: 's1', cat: 'shoes', name: 'Tan Leather Block Heels', color: 'Tan', type: 'Heels (2 inch)', style: 'Elevated' },
       { id: 's2', cat: 'shoes', name: 'Pointed-Toe Nude Flat Mules', color: 'Nude Tan', type: 'Pointed Flats', style: 'Comfort Elongating' },
       { id: 's3', cat: 'shoes', name: 'Clean Minimalist White Sneakers', color: 'White', type: 'Sneakers', style: 'Casual High-Low' },
       { id: 's4', cat: 'shoes', name: 'Gold Embroidered Juttis', color: 'Gold / Champagne', type: 'Ethnic Flats', style: 'Festive' },
 
-      // HANDBAGS
       { id: 'b1', cat: 'bags', name: 'Structured Cognac Leather Work Tote', color: 'Cognac Brown', capacity: 'Work / Laptop' },
       { id: 'b2', cat: 'bags', name: 'Compact Black Leather Crossbody', color: 'Black / Gold Buckle', capacity: 'Hands-Free' },
       { id: 'b3', cat: 'bags', name: 'Champagne Metallic Evening Clutch', color: 'Champagne Gold', capacity: 'Evening' },
 
-      // JEWELRY
       { id: 'j1', cat: 'jewelry', name: 'Polished Yellow Gold Chunky Hoops', metal: 'Yellow Gold', style: 'Everyday Chic' },
       { id: 'j2', cat: 'jewelry', name: 'Traditional Kundan & Pearl Jhumkas', metal: 'Antique Gold', style: 'Festive Statement' },
       { id: 'j3', cat: 'jewelry', name: 'Minimalist Freshwater Pearl Studs', metal: 'Gold / Pearl', style: 'Understated Classic' },
       { id: 'j4', cat: 'jewelry', name: 'Layered Delicate Gold Chain Pendant', metal: 'Yellow Gold', style: 'Neckline Elongator' },
 
-      // OUTERWEAR & LAYERS
       { id: 'l1', cat: 'layers', name: 'Tailored Camel Structured Blazer', color: 'Warm Camel', style: 'Office & AC Chic' },
       { id: 'l2', cat: 'layers', name: 'Cropped Mid-Wash Denim Jacket', color: 'Denim Blue', style: 'Casual Waist Defining' },
       { id: 'l3', cat: 'layers', name: 'Flowing Silk Kimono Duster', color: 'Olive & Gold', style: 'Graceful Column' },
 
-      // MAKEUP (LIPSTICKS & LINERS)
       { id: 'm1', cat: 'makeup', name: 'Warm Terracotta Spiced Brick Lipstick', type: 'Lipstick', finish: 'Velvet Matte', undertone: 'Warm Power Shade' },
       { id: 'm2', cat: 'makeup', name: 'Peachy Nude Hydrating Bullet Lipstick', type: 'Lipstick', finish: 'Satin Comfort', undertone: 'Everyday Nude' },
       { id: 'm3', cat: 'makeup', name: 'Classic Crimson Ruby Red Lipstick', type: 'Lipstick', finish: 'Bold Matte', undertone: 'Statement Glam' },
@@ -758,46 +722,34 @@
       { id: 'm6', cat: 'makeup', name: 'Smudgeable Deep Brown Kohl Kajal', type: 'Liner', finish: 'Soft Smudged', style: 'Everyday Simple' }
     ];
 
-    // ========================================================
-    // TAB SWITCHING
-    // ========================================================
     function switchTab(tabKey) {
       activeTab = tabKey;
-
-      // Update mobile buttons
       const mobKeys = ['today', 'closet', 'flattery', 'outfits', 'mixer'];
       mobKeys.forEach(k => {
         const btn = document.getElementById('mob-' + k);
         if (btn) {
-          if (k === tabKey) {
-            btn.className = 'mob-btn flex flex-col items-center gap-1 text-brand-700 font-bold';
-          } else {
-            btn.className = 'mob-btn flex flex-col items-center gap-1 text-stone-500 font-medium';
-          }
+          btn.className = (k === tabKey)
+            ? 'mob-btn flex flex-col items-center gap-1 text-brand-700 font-bold'
+            : 'mob-btn flex flex-col items-center gap-1 text-stone-500 font-medium';
         }
       });
 
-      // Update desktop buttons
       const dtabKeys = ['today', 'closet', 'flattery', 'outfits', 'mixer', 'events', 'travel', 'insights'];
       dtabKeys.forEach(k => {
         const btn = document.getElementById('dtab-' + k);
         if (btn) {
-          if (k === tabKey) {
-            btn.className = 'dtab-btn px-3 py-1.5 rounded-lg bg-brand-700 text-white font-semibold';
-          } else {
-            btn.className = 'dtab-btn px-3 py-1.5 rounded-lg hover:bg-stone-100 text-stone-700 font-medium';
-          }
+          btn.className = (k === tabKey)
+            ? 'dtab-btn px-3 py-1.5 rounded-lg bg-brand-700 text-white font-semibold'
+            : 'dtab-btn px-3 py-1.5 rounded-lg hover:bg-stone-100 text-stone-700 font-medium';
         }
       });
 
-      // Hide all tabs & show active
       document.querySelectorAll('.tab-view').forEach(el => el.classList.add('hidden'));
       const activeEl = document.getElementById('tab-' + tabKey);
       if (activeEl) activeEl.classList.remove('hidden');
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
-      // Trigger specific renders if needed
       if (tabKey === 'today') renderTodayOutfit();
       if (tabKey === 'closet') renderCloset('all');
       if (tabKey === 'flattery') renderFlatteryCards();
@@ -807,9 +759,6 @@
       if (tabKey === 'travel') renderTravelCapsule();
     }
 
-    // ========================================================
-    // TODAY'S OUTFIT GENERATOR
-    // ========================================================
     let todayIndex = 0;
     const todayOptions = [
       {
@@ -874,7 +823,6 @@
       const container = document.getElementById('today-outfit-container');
       const filtered = todayOptions.filter(o => o.vibe === currentVibe);
       const look = filtered[todayIndex % filtered.length] || todayOptions[0];
-
       const makeupChoice = makeupMode === 'simple' ? look.makeupSimple : look.makeupGlam;
 
       container.innerHTML = `
@@ -895,7 +843,6 @@
             </div>
           </div>
 
-          <!-- The Head-to-Toe Grid -->
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 text-xs">
             <div class="p-3.5 rounded-xl bg-stone-50 border border-stone-200">
               <span class="text-[10px] font-bold uppercase text-brand-700 tracking-wider block mb-1">👗 1. The Foundation Dress</span>
@@ -934,7 +881,6 @@
             </div>
           </div>
 
-          <!-- Stylist Secret Box -->
           <div class="bg-amber-50/60 border border-amber-200/80 rounded-xl p-3.5 text-xs space-y-1">
             <div class="flex items-center gap-1.5 text-amber-900 font-bold">
               <span>💡 Why This Proportion Works For You:</span>
@@ -977,9 +923,6 @@
       if (activeTab === 'outfits') renderOutfitsGrid();
     }
 
-    // ========================================================
-    // DIGITAL CLOSET VIEW
-    // ========================================================
     function filterCloset(cat) {
       document.querySelectorAll('.closet-nav-btn').forEach(b => {
         b.className = 'closet-nav-btn px-3 py-1.5 rounded-lg bg-white border border-stone-200 hover:bg-stone-50 text-stone-700 font-medium whitespace-nowrap';
@@ -1023,7 +966,6 @@
         `;
       });
 
-      // Quick "+ Add More" card
       html += `
         <div onclick="openAddItemModal()" class="cursor-pointer border-2 border-dashed border-stone-300 hover:border-brand-500 hover:bg-brand-50/30 rounded-xl p-4 flex flex-col items-center justify-center text-center space-y-1 transition-all">
           <div class="w-8 h-8 rounded-full bg-brand-100 text-brand-800 flex items-center justify-center text-base font-bold">+</div>
@@ -1040,9 +982,6 @@
       renderCloset('all');
     }
 
-    // ========================================================
-    // FLATTERY VERDICTS & RESCUE STYLING
-    // ========================================================
     function renderFlatteryCards() {
       const container = document.getElementById('flattery-cards-container');
       const dresses = wardrobe.filter(i => i.cat === 'dresses');
@@ -1070,7 +1009,6 @@
               </button>
             </div>
 
-            <!-- The Why Breakdown -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5 text-xs">
               <div class="p-3.5 rounded-xl bg-emerald-50/50 border border-emerald-200/70 space-y-1">
                 <span class="font-bold text-emerald-900 uppercase text-[10px] tracking-wide block">✅ Why It Works For Your Silhouette:</span>
@@ -1083,7 +1021,6 @@
               </div>
             </div>
 
-            <!-- Rescue Formula -->
             <div class="p-3.5 rounded-xl bg-brand-50/60 border border-brand-200 text-xs space-y-1">
               <span class="font-bold text-brand-900 uppercase text-[10px] tracking-wider block">🛠️ Stylist Rescue Formula (How to Style It Anyway):</span>
               <p class="text-stone-800 leading-relaxed font-medium">${dress.rescue}</p>
@@ -1095,12 +1032,8 @@
       container.innerHTML = html;
     }
 
-    // ========================================================
-    // CURATED HEAD-TO-TOE LOOKS
-    // ========================================================
     function renderOutfitsGrid() {
       const grid = document.getElementById('outfits-cards-grid');
-
       let html = '';
       todayOptions.forEach((look, idx) => {
         const makeup = makeupMode === 'simple' ? look.makeupSimple : look.makeupGlam;
@@ -1155,9 +1088,6 @@
       grid.innerHTML = html;
     }
 
-    // ========================================================
-    // CLOSET MIXER DROPDOWNS & LOGIC
-    // ========================================================
     function populateMixerDropdowns() {
       const dressEl = document.getElementById('mix-dress');
       const layerEl = document.getElementById('mix-layer');
@@ -1180,9 +1110,7 @@
       const dressId = document.getElementById('mix-dress').value;
       const dress = wardrobe.find(i => i.id === dressId) || wardrobe[0];
       const layerId = document.getElementById('mix-layer').value;
-      const shoeId = document.getElementById('mix-shoes').value;
       const jewId = document.getElementById('mix-jewelry').value;
-      const lipId = document.getElementById('mix-lip').value;
 
       let score = dress.score || 90;
       let feedback = dress.pros;
@@ -1217,9 +1145,6 @@
       }
     }
 
-    // ========================================================
-    // EVENT STYLIST
-    // ========================================================
     const eventGuides = {
       sangeet: {
         title: 'Sangeet & Cocktail Night',
@@ -1302,9 +1227,6 @@
       `;
     }
 
-    // ========================================================
-    // TRAVEL PACKING CAPSULE
-    // ========================================================
     function setTravelDays(days) {
       travelDays = days;
       document.getElementById('tday-3').className = days === 3 ? 'px-3 py-1.5 rounded-lg bg-brand-700 text-white font-semibold' : 'px-3 py-1.5 rounded-lg text-stone-600 hover:text-stone-900';
@@ -1366,16 +1288,8 @@
       }
     }
 
-    // ========================================================
-    // MODALS: PROFILE, ADD ITEM & SHARE
-    // ========================================================
-    
-    function showInstallInstructions() {
-      document.getElementById('modal-install').classList.remove('hidden');
-    }
-    function closeInstallModal() {
-      document.getElementById('modal-install').classList.add('hidden');
-    }
+    function showInstallInstructions() { document.getElementById('modal-install').classList.remove('hidden'); }
+    function closeInstallModal() { document.getElementById('modal-install').classList.add('hidden'); }
 
     function openProfileModal() { document.getElementById('modal-profile').classList.remove('hidden'); }
     function closeProfileModal() { document.getElementById('modal-profile').classList.add('hidden'); }
@@ -1435,7 +1349,7 @@
         <div class="space-y-3">
           <div class="flex items-center justify-between border-b border-stone-200 pb-2">
             <div>
-              <span class="text-[10px] font-bold text-brand-700 uppercase tracking-widest block">AuraWardrobe Curated Look</span>
+              <span class="text-[10px] font-bold text-brand-700 uppercase tracking-widest block">Sartor Curated Look</span>
               <h4 class="font-serif text-lg font-bold text-stone-900">${title}</h4>
             </div>
             <span class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded">97% Match</span>
@@ -1456,8 +1370,7 @@
     function closeShareModal() { document.getElementById('modal-share').classList.add('hidden'); }
 
     function copyShareText() {
-      const text = `AuraWardrobe Outfit Look:
-- Check out this outfit formula from my closet! Tailored for my silhouette and undertone.`;
+      const text = `Sartor Outfit Look:\n- Check out this outfit formula from my closet! Tailored for my silhouette and undertone.`;
       if (navigator.clipboard) {
         navigator.clipboard.writeText(text);
       }
@@ -1471,7 +1384,7 @@
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(wardrobe, null, 2));
       const downloadAnchor = document.createElement('a');
       downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", "AuraWardrobe_Cloud_Backup.json");
+      downloadAnchor.setAttribute("download", "Sartor_Cloud_Backup.json");
       document.body.appendChild(downloadAnchor);
       downloadAnchor.click();
       downloadAnchor.remove();
@@ -1481,8 +1394,6 @@
       window.print();
     }
 
-    // Run on startup
-    
     function showToast(msg, icon = '✓') {
       const toast = document.getElementById('app-toast');
       const toastMsg = document.getElementById('app-toast-msg');
@@ -1503,58 +1414,5 @@
       renderTodayOutfit();
     };
   </script>
-
-  <!-- In-Page Floating Toast Notification -->
-  <div id="app-toast" class="fixed bottom-24 md:bottom-8 left-1/2 transform -translate-x-1/2 z-50 bg-stone-900 text-white text-xs px-4 py-2.5 rounded-xl shadow-xl border border-stone-700 transition-all duration-300 opacity-0 pointer-events-none flex items-center gap-2">
-    <span id="app-toast-icon">✓</span>
-    <span id="app-toast-msg">Notification</span>
-  </div>
-
-  <!-- Standalone App Installation Guide Modal -->
-  <div id="modal-install" class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
-      <div class="flex items-center justify-between border-b border-stone-200 pb-3">
-        <div class="flex items-center gap-2">
-          <span class="text-xl">📲</span>
-          <h3 class="font-serif text-lg font-bold text-stone-900">Install as Standalone App</h3>
-        </div>
-        <button onclick="closeInstallModal()" class="text-stone-400 hover:text-stone-700 text-xl font-bold">&times;</button>
-      </div>
-
-      <div class="space-y-3 text-xs text-stone-700 leading-relaxed">
-        <!-- iOS Instructions -->
-        <div class="p-3.5 rounded-xl bg-stone-50 border border-stone-200 space-y-1.5">
-          <div class="flex items-center gap-2 font-bold text-stone-900">
-            <span>🍏 iPhone / iPad (iOS Users):</span>
-          </div>
-          <ol class="list-decimal list-inside space-y-1 text-stone-600 pl-1">
-            <li>Open this link in <strong>Safari</strong> on your iPhone.</li>
-            <li>Tap the <strong>Share</strong> icon (box with upward arrow) at the bottom.</li>
-            <li>Scroll down and tap <strong>"Add to Home Screen"</strong>.</li>
-            <li>Tap <strong>Add</strong>. It will now launch full-screen as a standalone app on your home screen!</li>
-          </ol>
-        </div>
-
-        <!-- Android Instructions -->
-        <div class="p-3.5 rounded-xl bg-emerald-50/60 border border-emerald-200 space-y-1.5">
-          <div class="flex items-center gap-2 font-bold text-emerald-950">
-            <span>🤖 Android Users (Chrome / Samsung Internet):</span>
-          </div>
-          <ol class="list-decimal list-inside space-y-1 text-stone-600 pl-1">
-            <li>Open this link in <strong>Google Chrome</strong> or your mobile browser.</li>
-            <li>Tap the <strong>3 vertical dots</strong> (Menu) at top right.</li>
-            <li>Select <strong>"Install App"</strong> or <strong>"Add to Home screen"</strong>.</li>
-            <li>It installs directly into your Android app drawer with its own app icon and runs full-screen!</li>
-          </ol>
-        </div>
-      </div>
-
-      <div class="pt-2 border-t border-stone-200 flex justify-end">
-        <button onclick="closeInstallModal()" class="px-5 py-2 rounded-xl bg-brand-700 hover:bg-brand-800 text-white text-xs font-semibold">
-          Got It
-        </button>
-      </div>
-    </div>
-  </div>
 </body>
 </html>
