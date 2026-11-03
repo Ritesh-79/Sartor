@@ -1,6 +1,6 @@
 {
-  "appId": "com.aurawardrobe.app",
-  "appName": "AuraWardrobe",
+  "appId": "com.sartor.app",
+  "appName": "Sartor",
   "webDir": "www",
   "bundledWebRuntime": false,
   "server": {
